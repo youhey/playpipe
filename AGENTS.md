@@ -206,7 +206,6 @@ Phase 1 で実装するもの:
 - Google OAuth only admin authentication
 - admin email allow list
 - safe local dev login helper
-- User read-only admin resource
 - Sanctum API token admin resource
 - API token issue / rotate Artisan commands
 - GitHub Actions CI
