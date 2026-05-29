@@ -2,7 +2,7 @@
 
 `playpipe` の private Web API は Laravel Sanctum personal access token で保護します。
 
-Phase 2 では `voicepipe` などの renderer から、MP3 file と `radiopipe` Episode JSON を受け取る write-only API を提供します。Episode read API、playback API、feedback API はまだ実装していません。
+Phase 2 では `voicepipe` などの renderer から、MP3 file と `radiopipe` Episode JSON を受け取る write-only API を提供します。Phase 3 の playback UI は browser login session で保護された Web route として提供し、API token では保護しません。
 
 ## API Token
 
@@ -133,15 +133,27 @@ episodes/{episode_key}/audio.mp3
 episodes/{episode_key}/episode.json
 ```
 
-Production upload は local filesystem に永続保存しません。`storage/app`、`public` disk、`php artisan storage:link`、公開 URL、署名付き URL 生成には依存しません。MP3 playback/download URL は Phase 3 以降で設計します。
+Production upload は local filesystem に永続保存しません。`storage/app`、`public` disk、`php artisan storage:link`、公開 URLには依存しません。
+
+## Playback UI
+
+Episode upload API は引き続き write-only です。Episode playback と MP3 download は API token ではなく、browser login session で保護された Web route で提供します。
+
+```txt
+GET /episodes
+GET /episodes/{episode_key}
+GET /episodes/{episode_key}/audio
+GET /episodes/{episode_key}/download
+```
+
+Audio route は private object を public bucket にせず、temporary URL redirect または Laravel stream response で返します。
+
+詳細は [`docs/playback.md`](playback.md) を参照してください。
 
 ## Not Implemented
 
-Phase 2 では以下を提供しません。
+Phase 3 では以下を提供しません。
 
 - Episode read/list/latest API
-- MP3 playback API
-- MP3 download API
-- scenario viewer API
 - Good / Bad feedback API
 - radiopipe feedback sync

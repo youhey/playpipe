@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Database\Factories\EpisodeSectionFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -20,6 +22,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 ])]
 class EpisodeSection extends Model
 {
+    /** @use HasFactory<EpisodeSectionFactory> */
+    use HasFactory;
+
     /**
      * 所属する Episode。
      *

@@ -8,7 +8,9 @@ Phase 1 provided the application foundation: Laravel, Filament, Google OAuth adm
 
 Phase 2 adds a private Episode Upload API for receiving rendered MP3 files and `radiopipe` Episode JSON from downstream renderers such as `voicepipe`.
 
-MP3 playback, MP3 download, scenario viewing, Good/Bad feedback, feedback sync, and public podcast feeds are planned for later phases.
+Phase 3 adds a private browser playback UI for listening to uploaded episodes, downloading MP3 files, and reading scenario sections and topics.
+
+Good/Bad feedback, feedback sync, and public podcast feeds are planned for later phases.
 
 ## Position
 
@@ -126,6 +128,19 @@ The endpoint requires a Sanctum token with the `episodes:write` ability. It stor
 
 See [docs/api.md](docs/api.md).
 
+## Playback UI
+
+`playpipe` provides a private browser UI for listening to uploaded radio episodes, downloading MP3 files, and reading the original scenario sections and topics.
+
+- `/episodes`
+- `/episodes/{episode_key}`
+- `/episodes/{episode_key}/audio`
+- `/episodes/{episode_key}/download`
+
+Playback and download routes require a browser login session. MP3 files remain private object storage objects and are not exposed through public storage.
+
+See [docs/playback.md](docs/playback.md).
+
 ## Laravel Cloud
 
 The production target is Laravel Cloud.
@@ -135,6 +150,7 @@ Important assumptions:
 - Application containers are ephemeral.
 - Persistent binary objects must use an S3-compatible disk, not local filesystem storage.
 - Episode uploads use `PLAYPIPE_AUDIO_DISK`, which defaults to the S3-compatible disk.
+- Playback and download routes read from private object storage through authenticated routes or short-lived temporary URLs.
 - Logs go to stdout/stderr.
 - DB, cache, session, queue, and filesystem are selected by environment variables.
 - Laravel MySQL is the expected database unless explicitly changed later.

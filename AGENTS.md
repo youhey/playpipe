@@ -10,6 +10,8 @@ Phase 1 では Laravel / Filament / Google OAuth / API Token / Docker Compose / 
 
 Phase 2 では `POST /api/episodes` による MP3 + `radiopipe` Episode JSON upload と、Episode / Section / Topic の保存モデルだけを扱います。
 
+Phase 3 では browser login session で保護された Episode 一覧、詳細、audio、download route と、Filament での Episode 確認画面を扱います。
+
 ## Repository Layout
 
 Laravel アプリ本体は必ず `src/` 配下に置きます。
@@ -170,6 +172,7 @@ Automated tests must not call real external APIs. Google OAuth、Laravel Cloud A
 - local dev login helper は `local` / `testing` かつ明示有効化時だけ動かします。
 - production で local dev login helper を有効にしません。
 - uploaded MP3 を、認証または署名付き access なしで公開しません。
+- playback / download route は必ず認証を要求します。
 
 ## Episode Upload Constraints
 
@@ -180,6 +183,17 @@ Automated tests must not call real external APIs. Google OAuth、Laravel Cloud A
 - duration は request の `audio_duration_seconds` がある場合だけ保存します。
 - Episode JSON は original uploaded payload を保存します。
 - DB では Episode、scenario section、topic snapshot に展開します。
+
+## Playback Constraints
+
+- uploaded MP3 files を public storage から公開しません。
+- playback and download routes must require authentication.
+- audio route は temporary URL redirect を優先し、不可なら Laravel stream response にします。
+- browser UI は simple Blade / Livewire を優先し、SPA complexity を追加しません。
+- playback UI のために `ffmpeg` / `ffprobe` dependency を追加しません。
+- raw Episode JSON を画面に不用意に dump しません。
+- external links は `noopener noreferrer` を付けます。
+- feedback UI / feedback sync は Phase 3 では実装しません。
 
 ## Phase 1 Scope
 
@@ -213,13 +227,23 @@ Phase 2 で実装するもの:
 - duplicate `episode_key` の `409 Conflict`
 - upload API feature tests
 
+## Phase 3 Scope
+
+Phase 3 で実装するもの:
+
+- logged-in Episode list at `/episodes`
+- logged-in Episode detail at `/episodes/{episode_key}`
+- authenticated audio route
+- authenticated MP3 download route
+- scenario section display
+- topic display with source/discussion links
+- read-only Filament Episode / Section / Topic resources
+- playback feature tests
+
 ## Not Implemented
 
 以下は明示依頼があるまで実装しません。
 
-- MP3 playback UI
-- MP3 download
-- scenario JSON viewer
 - topic Good / Bad 評価 UI
 - radiopipe feedback sync
 - playback analytics
