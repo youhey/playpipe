@@ -41,6 +41,17 @@ AWS_URL="http://localhost:9000/playpipe-local"
 AWS_USE_PATH_STYLE_ENDPOINT=true
 ```
 
+## Upload
+
+```env
+PLAYPIPE_UPLOAD_AUDIO_MAX_KB=102400
+PLAYPIPE_AUDIO_DISK=s3
+```
+
+`PLAYPIPE_AUDIO_DISK` は Episode upload API が MP3 と uploaded Episode JSON を保存する disk です。local default は MinIO backed `s3` です。本番では Laravel Cloud Object Storage か S3 compatible storage を指定してください。
+
+production upload を local filesystem に永続保存しないでください。
+
 ## Admin Auth
 
 ```env

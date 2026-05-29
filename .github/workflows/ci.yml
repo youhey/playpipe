@@ -48,6 +48,8 @@ jobs:
       MAIL_MAILER: array
       PLAYPIPE_ADMIN_ALLOWED_EMAILS: admin@example.test
       PLAYPIPE_ADMIN_DEV_LOGIN_ENABLED: false
+      PLAYPIPE_UPLOAD_AUDIO_MAX_KB: "102400"
+      PLAYPIPE_AUDIO_DISK: s3
 
     defaults:
       run:

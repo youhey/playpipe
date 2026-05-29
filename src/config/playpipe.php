@@ -26,4 +26,9 @@ return [
             'episodes:write',
         ],
     ],
+
+    'upload' => [
+        'audio_max_kb' => (int) env('PLAYPIPE_UPLOAD_AUDIO_MAX_KB', 102400),
+        'storage_disk' => env('PLAYPIPE_AUDIO_DISK', env('FILESYSTEM_DISK', 's3')),
+    ],
 ];

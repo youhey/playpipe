@@ -4,9 +4,11 @@ Private Playback Pipeline for Rendered Radio Episodes.
 
 `playpipe` is a tiny private Laravel app that will receive rendered radio episode audio and scenario JSON for playback, download, viewing, and feedback.
 
-Phase 1 provides the application foundation only: Laravel, Filament, Google OAuth admin access, Sanctum API token management, Docker Compose, CI, Dependabot, Makefile workflow, and Laravel Cloud compatibility.
+Phase 1 provided the application foundation: Laravel, Filament, Google OAuth admin access, Sanctum API token management, Docker Compose, CI, Dependabot, Makefile workflow, and Laravel Cloud compatibility.
 
-Episode upload, MP3 playback, scenario viewing, and feedback sync are planned for later phases and are not implemented in Phase 1.
+Phase 2 adds a private Episode Upload API for receiving rendered MP3 files and `radiopipe` Episode JSON from downstream renderers such as `voicepipe`.
+
+MP3 playback, MP3 download, scenario viewing, Good/Bad feedback, feedback sync, and public podcast feeds are planned for later phases.
 
 ## Position
 
@@ -110,7 +112,19 @@ Allowed abilities:
 - `feedback:write`
 - `feedback:sync`
 
-Episode upload and feedback APIs are not implemented in Phase 1.
+## API
+
+`playpipe` exposes a private write-only Episode Upload API for receiving MP3 files and `radiopipe` Episode JSON from downstream renderers such as `voicepipe`.
+
+```http
+POST /api/episodes
+Authorization: Bearer {PLAYPIPE_API_TOKEN}
+Content-Type: multipart/form-data
+```
+
+The endpoint requires a Sanctum token with the `episodes:write` ability. It stores MP3 and uploaded Episode JSON on the configured object storage disk, then persists Episode, section, and topic rows in MySQL.
+
+See [docs/api.md](docs/api.md).
 
 ## Laravel Cloud
 
@@ -120,6 +134,7 @@ Important assumptions:
 
 - Application containers are ephemeral.
 - Persistent binary objects must use an S3-compatible disk, not local filesystem storage.
+- Episode uploads use `PLAYPIPE_AUDIO_DISK`, which defaults to the S3-compatible disk.
 - Logs go to stdout/stderr.
 - DB, cache, session, queue, and filesystem are selected by environment variables.
 - Laravel MySQL is the expected database unless explicitly changed later.
