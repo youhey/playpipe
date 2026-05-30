@@ -10,7 +10,7 @@ Phase 1 では Laravel / Filament / Google OAuth / API Token / Docker Compose / 
 
 Phase 2 では `POST /api/episodes` による MP3 + `radiopipe` Episode JSON upload と、Episode / Section / Topic の保存モデルだけを扱います。
 
-Phase 3 では browser login session で保護された Episode 一覧、詳細、audio、download route と、Filament での Episode 確認画面を扱います。
+Phase 3 では browser login session で保護された Episode 一覧、詳細、audio、download route と、Filament での Episode 確認画面を扱います。Phase 3.6 では canonical viewer prefix を `/listen` にします。
 
 ## Repository Layout
 
@@ -205,6 +205,18 @@ This rule is important because `voicepipe` and other downstream Rust application
 - external links は `noopener noreferrer` を付けます。
 - feedback UI / feedback sync は Phase 3 では実装しません。
 
+## Listen Viewer UI
+
+The `/listen` viewer is a separate authenticated visual experience from Filament admin.
+
+Do not replace the `/listen` UI with Filament components or generic admin styling.
+
+Visual fidelity to `docs/design/listen-viewer/reference.png`, `prototype.html`, and `DESIGN.md` is a priority for this area.
+
+Authentication and allowed-email access rules are shared with the admin foundation, but routes, controllers, views, CSS, and JavaScript should remain separated.
+
+Do not use remote hotlinked portrait images in production code.
+
 ## Phase 1 Scope
 
 Phase 1 で実装するもの:
@@ -240,8 +252,8 @@ Phase 2 で実装するもの:
 
 Phase 3 で実装するもの:
 
-- logged-in Episode list at `/episodes`
-- logged-in Episode detail at `/episodes/{episode_key}`
+- logged-in Episode list at `/listen/episodes`
+- logged-in Episode detail at `/listen/episodes/{episode_key}`
 - authenticated audio route
 - authenticated MP3 download route
 - scenario section display

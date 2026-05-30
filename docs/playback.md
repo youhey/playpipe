@@ -2,22 +2,27 @@
 
 Phase 3 adds a private browser UI for listening to uploaded episodes, downloading MP3 files, and reading scenario sections and topics.
 
+Phase 3.6 makes `/listen` the canonical authenticated viewer prefix. `/admin` remains the Filament admin tool and `/api` remains the machine-to-machine API surface.
+
 ## Routes
 
 All playback routes require a browser login session.
 
 ```txt
-GET /episodes
-GET /episodes/{episode_key}
-GET /episodes/{episode_key}/audio
-GET /episodes/{episode_key}/download
+GET /listen
+GET /listen/episodes
+GET /listen/episodes/{episode_key}
+GET /listen/episodes/{episode_key}/audio
+GET /listen/episodes/{episode_key}/download
 ```
 
 `episode_key` is used in URLs instead of DB ids.
 
+For compatibility, old `/episodes` viewer routes redirect to the matching `/listen/episodes` routes.
+
 ## Authentication
 
-Playback uses the same Laravel session auth as the admin foundation. Unauthenticated users are redirected to `/login`, which starts Google OAuth. Local development may use `/_local/admin/login` only when the Phase 1 safety flags allow it.
+Playback uses the same Laravel session auth and allowed-email access rules as the admin foundation. Unauthenticated users are redirected to `/login`, which starts Google OAuth. Authenticated users not in `PLAYPIPE_ADMIN_ALLOWED_EMAILS` receive `403 Forbidden`. Local development may use `/_local/admin/login` only when the Phase 1 safety flags allow it.
 
 API tokens are not used for playback or download routes. API tokens remain for machine-to-machine upload.
 
@@ -36,12 +41,19 @@ The app does not depend on:
 - `php artisan storage:link`
 - unauthenticated direct object URLs
 
-## UI
+## Listen Viewer UI
 
-The daily playback UI is separate from Filament admin:
+The daily playback UI is separate from Filament admin and uses dedicated Listen routes, controllers, views, CSS, and JavaScript:
 
-- `/episodes`: available Episode list
-- `/episodes/{episode_key}`: detail page with HTML5 audio, download link, scenario sections, and topics
+- `/listen`: current transmission / viewer home
+- `/listen/episodes`: available Episode archive
+- `/listen/episodes/{episode_key}`: detail page with custom visual player, download link, scenario sections, and topics
+
+The visual direction is documented in:
+
+- `docs/design/listen-viewer/DESIGN.md`
+- `docs/design/listen-viewer/prototype.html`
+- `docs/design/listen-viewer/reference.png`
 
 Filament remains the admin/inspection surface:
 
@@ -56,4 +68,4 @@ Phase 3 does not implement full Laravel-side Range request handling. Browser pla
 
 ## Not Implemented
 
-Phase 3 does not implement Good / Bad feedback UI, radiopipe feedback sync, public podcast feeds, playback analytics, PWA support, or custom audio-player JavaScript.
+Phase 3.6 does not implement Good / Bad feedback UI, radiopipe feedback sync, public podcast feeds, playback analytics, PWA support, real waveform generation, or `ffmpeg` / `ffprobe` integration.

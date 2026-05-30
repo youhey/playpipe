@@ -130,14 +130,17 @@ The machine-readable contract is [docs/openapi.yaml](docs/openapi.yaml). Keep it
 
 See [docs/api.md](docs/api.md).
 
-## Playback UI
+## Listen Viewer
 
-`playpipe` provides a private browser UI for listening to uploaded radio episodes, downloading MP3 files, and reading the original scenario sections and topics.
+The private listener UI is available under `/listen`.
 
-- `/episodes`
-- `/episodes/{episode_key}`
-- `/episodes/{episode_key}/audio`
-- `/episodes/{episode_key}/download`
+It is separate from the Filament admin panel and focuses on listening to uploaded MP3 episodes, reading scenario sections, and browsing source topics.
+
+- `/listen`
+- `/listen/episodes`
+- `/listen/episodes/{episode_key}`
+- `/listen/episodes/{episode_key}/audio`
+- `/listen/episodes/{episode_key}/download`
 
 Playback and download routes require a browser login session. MP3 files remain private object storage objects and are not exposed through public storage.
 

@@ -150,13 +150,14 @@ Production upload は local filesystem に永続保存しません。`storage/ap
 
 ## Playback UI
 
-Episode upload API は引き続き write-only です。Episode playback と MP3 download は API token ではなく、browser login session で保護された Web route で提供します。
+Episode upload API は引き続き write-only です。Episode playback と MP3 download は API token ではなく、browser login session で保護された `/listen` Web route で提供します。
 
 ```txt
-GET /episodes
-GET /episodes/{episode_key}
-GET /episodes/{episode_key}/audio
-GET /episodes/{episode_key}/download
+GET /listen
+GET /listen/episodes
+GET /listen/episodes/{episode_key}
+GET /listen/episodes/{episode_key}/audio
+GET /listen/episodes/{episode_key}/download
 ```
 
 Audio route は private object を public bucket にせず、temporary URL redirect または Laravel stream response で返します。

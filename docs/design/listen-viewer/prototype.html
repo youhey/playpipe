@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NOZOMI_RADIO_01 | PROTOCOL_FEED</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Anton&amp;family=Metropolis:wght@400;500;700&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+        .scanline-effect {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: rgba(174, 0, 54, 0.1);
+            z-index: 100;
+            pointer-events: none;
+            animation: scanline 8s linear infinite;
+        }
+        .tartan-pattern {
+            background-color: #000;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(174, 0, 54, 0.2) 35px, rgba(174, 0, 54, 0.2) 40px),
+                repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(174, 0, 54, 0.2) 35px, rgba(174, 0, 54, 0.2) 40px);
+        }
+        .noise-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.05;
+            pointer-events: none;
+            z-index: 99;
+        }
+        .skew-active { transform: skewX(-6deg); }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error-container": "#93000a",
+                        "surface-tint": "#ffb4a8",
+                        "on-secondary-fixed-variant": "#004f50",
+                        "primary-fixed": "#ffdad4",
+                        "background": "#131313",
+                        "surface-dim": "#131313",
+                        "inverse-primary": "#c00000",
+                        "error": "#ffb4ab",
+                        "on-tertiary-fixed-variant": "#910032",
+                        "on-primary-container": "#ffcdc5",
+                        "on-surface": "#e2e2e2",
+                        "on-secondary-fixed": "#002020",
+                        "tertiary-fixed": "#ffd9dc",
+                        "on-tertiary-container": "#ffcbd0",
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface-container-high": "#2a2a2a",
+                        "secondary-fixed": "#aeeeee",
+                        "tertiary": "#ffb2bb",
+                        "surface-container": "#1f1f1f",
+                        "surface": "#131313",
+                        "on-primary": "#690000",
+                        "subculture-pink": "#E6325F",
+                        "inverse-on-surface": "#303030",
+                        "primary-fixed-dim": "#ffb4a8",
+                        "tertiary-fixed-dim": "#ffb2bb",
+                        "on-tertiary": "#670021",
+                        "on-surface-variant": "#e7bdb6",
+                        "on-background": "#e2e2e2",
+                        "secondary": "#92d2d2",
+                        "on-secondary-container": "#84c3c3",
+                        "highlight-mint": "#AEEEEE",
+                        "on-secondary": "#003737",
+                        "on-primary-fixed-variant": "#930000",
+                        "secondary-container": "#025253",
+                        "outline": "#ad8882",
+                        "on-primary-fixed": "#410000",
+                        "surface-container-low": "#1b1b1b",
+                        "outline-variant": "#5d3f3b",
+                        "surface-variant": "#353535",
+                        "void-black": "#000000",
+                        "signal-crimson": "#AE0036",
+                        "on-tertiary-fixed": "#400011",
+                        "surface-container-highest": "#353535",
+                        "paper-white": "#F4F6F9",
+                        "inverse-surface": "#e2e2e2",
+                        "secondary-fixed-dim": "#92d2d2",
+                        "surface-bright": "#393939",
+                        "on-error-container": "#ffdad6",
+                        "on-error": "#690005",
+                        "primary": "#ffb4a8",
+                        "tertiary-container": "#bc0444",
+                        "primary-container": "#c00000"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-md": "16px",
+                        "container-max": "1280px",
+                        "unit": "4px",
+                        "stack-lg": "32px",
+                        "margin": "24px",
+                        "stack-sm": "8px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Anton"],
+                        "headline-lg-mobile": ["Anton"],
+                        "headline-xl": ["Anton"],
+                        "body-md": ["Metropolis"],
+                        "label-sm": ["JetBrains Mono"],
+                        "label-md": ["JetBrains Mono"],
+                        "body-lg": ["Metropolis"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "0.05em", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "400"}],
+                        "headline-xl": ["64px", {"lineHeight": "72px", "letterSpacing": "0.02em", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-void-black text-on-surface font-body-md selection:bg-signal-crimson selection:text-white overflow-x-hidden">
+<div class="noise-overlay"></div>
+<div class="scanline-effect"></div>
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-gutter h-16 bg-void-black dark:bg-void-black border-b-3 border-signal-crimson">
+<div class="font-headline-lg-mobile text-headline-lg-mobile text-signal-crimson tracking-tighter uppercase">
+            NOZOMI_RADIO_01
+        </div>
+<div class="flex items-center gap-stack-sm">
+<button class="text-signal-crimson p-2 hover:bg-signal-crimson hover:text-void-black transition-colors duration-100 material-symbols-outlined" data-icon="sensors">sensors</button>
+<button class="text-signal-crimson p-2 hover:bg-signal-crimson hover:text-void-black transition-colors duration-100 material-symbols-outlined" data-icon="settings">settings</button>
+</div>
+</header>
+<main class="pt-20 pb-24 px-gutter flex flex-col gap-stack-lg max-w-md mx-auto">
+<!-- Signal Status Bar -->
+<div class="flex items-center justify-between border-2 border-highlight-mint/30 p-2 bg-highlight-mint/5">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 bg-highlight-mint animate-pulse rounded-full"></span>
+<span class="font-label-sm text-label-sm text-highlight-mint uppercase">Frequency: 99.7 MHz [LIVE]</span>
+</div>
+<div class="flex gap-1">
+<div class="w-1 h-3 bg-highlight-mint"></div>
+<div class="w-1 h-4 bg-highlight-mint"></div>
+<div class="w-1 h-2 bg-highlight-mint"></div>
+<div class="w-1 h-5 bg-highlight-mint"></div>
+</div>
+</div>
+<!-- Featured Player -->
+<section class="relative group">
+<div class="absolute -top-1 -left-1 w-full h-full bg-signal-crimson opacity-20 border-2 border-signal-crimson"></div>
+<div class="relative bg-void-black border-3 border-signal-crimson overflow-hidden">
+<div class="h-48 overflow-hidden relative">
+<img alt="Cyberpunk Audio Visualization" class="w-full h-full object-cover grayscale brightness-50 contrast-125" data-alt="A gritty close-up of a high-tech digital audio equalizer with glowing neon crimson lines and mint green frequency bars. The setting is a dark, underground broadcast studio with wires and industrial metal textures. The mood is high-energy and rebellious, with a heavy cinematic grain and digital distortion effects that embody a punk-geek aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCuV0eTnJNNn_J4n-j2IoahjWEvHZHzwE4TCCZ55D8jHoABjSEkqdfU08ePh4L12q7TrfS11PIPn39awBk0_oa1ptAJK5tT6CLNzK3mF101I8aX8fJ5iLWo-XS59g18IiNMK7EaCmg4J_52zLX75N41yHUg_HuhSU3o9IX4SWSuG7ktwPH7NLrlsI8ShQU1cnhe4zc5_vbObBzwbs8R9W0PspJXQrTRCAgyUqz_Qdv6tmm9FPbk_FhhWL-b4z2QqrHcf4VY2wk1mlMe"/>
+<div class="absolute inset-0 bg-gradient-to-t from-void-black to-transparent"></div>
+<div class="absolute bottom-4 left-4">
+<span class="bg-signal-crimson text-void-black px-2 py-0.5 font-label-sm text-label-sm uppercase font-bold">Now Playing</span>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-white leading-none mt-1">PROTO_GHOST_08.MP3</h2>
+</div>
+</div>
+<div class="p-4 bg-void-black space-y-4">
+<!-- Progress Bar -->
+<div class="space-y-1">
+<div class="w-full h-1.5 bg-surface-variant relative">
+<div class="absolute top-0 left-0 h-full w-2/3 bg-signal-crimson"></div>
+</div>
+<div class="flex justify-between font-label-sm text-label-sm text-highlight-mint">
+<span>04:12</span>
+<span>06:44</span>
+</div>
+</div>
+<!-- Controls -->
+<div class="flex justify-around items-center">
+<button class="text-highlight-mint material-symbols-outlined text-3xl" data-icon="skip_previous">skip_previous</button>
+<button class="bg-signal-crimson text-void-black w-16 h-16 flex items-center justify-center rounded-none border-2 border-white material-symbols-outlined text-4xl transform hover:scale-105 active:scale-95 transition-transform" data-icon="play_arrow">play_arrow</button>
+<button class="text-highlight-mint material-symbols-outlined text-3xl" data-icon="skip_next">skip_next</button>
+</div>
+</div>
+</div>
+<!-- Decorative Screws -->
+<div class="absolute top-0 left-0 w-2 h-2 bg-signal-crimson border border-void-black transform -translate-x-1/2 -translate-y-1/2"></div>
+<div class="absolute top-0 right-0 w-2 h-2 bg-signal-crimson border border-void-black transform translate-x-1/2 -translate-y-1/2"></div>
+<div class="absolute bottom-0 left-0 w-2 h-2 bg-signal-crimson border border-void-black transform -translate-x-1/2 translate-y-1/2"></div>
+<div class="absolute bottom-0 right-0 w-2 h-2 bg-signal-crimson border border-void-black transform translate-x-1/2 translate-y-1/2"></div>
+</section>
+<!-- Dense Topics List (Accordion) -->
+<section class="space-y-stack-sm">
+<div class="tartan-pattern p-2 border-b-2 border-signal-crimson mb-2">
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-white uppercase italic">PROTOCOL_FEED</h3>
+</div>
+<!-- Accordion Items -->
+<div class="space-y-unit" id="accordion-container">
+<!-- Template Item -->
+<script>
+                    const topics = [
+                        { id: '001', title: 'UNDERGROUND_VIBES_VOL_1', status: 'UNREAD', rating: 4 },
+                        { id: '002', title: 'ENCRYPTED_SIGNAL_BETA', status: 'READ', rating: 5 },
+                        { id: '003', title: 'VOID_CHANNEL_LOGS', status: 'UNREAD', rating: 3 },
+                        { id: '004', title: 'MINT_CONDITION_DATA', status: 'READ', rating: 4 },
+                        { id: '005', title: 'CRIMSON_NETWORK_ERROR', status: 'READ', rating: 2 },
+                        { id: '006', title: 'GEEK_PUNK_MANIFESTO', status: 'UNREAD', rating: 5 },
+                        { id: '007', title: 'SIGNAL_INTERFERENCE_09', status: 'READ', rating: 4 },
+                        { id: '008', title: 'PROTOCOL_BREACH_LOGS', status: 'UNREAD', rating: 1 },
+                    ];
+
+                    document.addEventListener('DOMContentLoaded', () => {
+                        const container = document.getElementById('accordion-container');
+                        
+                        // Generating 50 items by looping
+                        for(let i = 0; i < 50; i++) {
+                            const topic = topics[i % topics.length];
+                            const item = document.createElement('div');
+                            item.className = "border-b border-signal-crimson/30 overflow-hidden";
+                            item.innerHTML = `
+                                <button onclick="toggleAccordion(this)" class="w-full flex items-center justify-between p-3 bg-surface-container-low hover:bg-highlight-mint/10 transition-colors group">
+                                    <div class="flex items-center gap-3">
+                                        <span class="font-label-sm text-label-sm ${topic.status === 'UNREAD' ? 'text-signal-crimson font-bold' : 'text-on-surface-variant'}">${String(i + 1).padStart(3, '0')}</span>
+                                        <span class="font-label-md text-label-md text-on-surface uppercase tracking-tight">${topic.title}_${i}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        ${topic.status === 'UNREAD' ? '<span class="w-1.5 h-1.5 bg-signal-crimson rounded-full"></span>' : ''}
+                                        <span class="material-symbols-outlined text-sm text-on-surface-variant transition-transform group-aria-expanded:rotate-180" data-icon="expand_more">expand_more</span>
+                                    </div>
+                                </button>
+                                <div class="hidden p-4 bg-void-black border-l-3 border-highlight-mint space-y-3">
+                                    <p class="font-label-sm text-label-sm text-on-surface-variant italic">DECRYPTED_CONTENT: High-frequency signal detected in Sector 7. Recommend immediate protocol update.</p>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex gap-1">
+                                            ${Array(5).fill(0).map((_, idx) => `
+                                                <button class="material-symbols-outlined text-lg ${idx < topic.rating ? 'text-highlight-mint' : 'text-surface-variant'}" style="font-variation-settings: 'FILL' ${idx < topic.rating ? 1 : 0}" data-icon="star">star</button>
+                                            `).join('')}
+                                        </div>
+                                        <button class="px-4 py-1 border border-highlight-mint text-highlight-mint font-label-sm text-label-sm hover:bg-highlight-mint hover:text-void-black transition-colors uppercase">Execute_Link</button>
+                                    </div>
+                                </div>
+                            `;
+                            container.appendChild(item);
+                        }
+                    });
+
+                    function toggleAccordion(btn) {
+                        const content = btn.nextElementSibling;
+                        const isHidden = content.classList.contains('hidden');
+                        
+                        // Close all others
+                        document.querySelectorAll('#accordion-container > div > div').forEach(c => c.classList.add('hidden'));
+                        document.querySelectorAll('#accordion-container button').forEach(b => b.setAttribute('aria-expanded', 'false'));
+
+                        if (isHidden) {
+                            content.classList.remove('hidden');
+                            btn.setAttribute('aria-expanded', 'true');
+                        }
+                    }
+                </script>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center md:hidden h-16 bg-void-black border-t-3 border-signal-crimson">
+<a class="flex flex-col items-center justify-center bg-signal-crimson text-void-black p-1 w-1/4 h-full scale-95 duration-100" href="#">
+<span class="material-symbols-outlined" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-sm text-label-sm uppercase mt-0.5">HOME</span>
+</a>
+<a class="flex flex-col items-center justify-center text-signal-crimson p-1 w-1/4 h-full hover:bg-surface-variant transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-sm text-label-sm uppercase mt-0.5">CHAR</span>
+</a>
+<a class="flex flex-col items-center justify-center text-signal-crimson p-1 w-1/4 h-full hover:bg-surface-variant transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="bolt">bolt</span>
+<span class="font-label-sm text-label-sm uppercase mt-0.5">TRENDS</span>
+</a>
+<a class="flex flex-col items-center justify-center text-signal-crimson p-1 w-1/4 h-full hover:bg-surface-variant transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-label-sm text-label-sm uppercase mt-0.5">INFO</span>
+</a>
+</nav>
+<!-- Floating Action Button -->
+<button class="fixed bottom-20 right-4 w-14 h-14 bg-highlight-mint text-void-black flex items-center justify-center border-2 border-void-black shadow-[4px_4px_0px_0px_rgba(174,0,54,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all z-40">
+<span class="material-symbols-outlined text-3xl" data-icon="add">add</span>
+</button>
+<script>
+        // Micro-interactions
+        document.querySelectorAll('button, a').forEach(el => {
+            el.addEventListener('mousedown', () => {
+                el.classList.add('skew-active');
+            });
+            el.addEventListener('mouseup', () => {
+                el.classList.remove('skew-active');
+            });
+            el.addEventListener('mouseleave', () => {
+                el.classList.remove('skew-active');
+            });
+        });
+    </script>
+</body></html>

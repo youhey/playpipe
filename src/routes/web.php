@@ -2,10 +2,11 @@
 
 use App\Http\Controllers\Auth\GoogleOAuthController;
 use App\Http\Controllers\Auth\LocalAdminLoginController;
-use App\Http\Controllers\Episodes\EpisodeAudioController;
-use App\Http\Controllers\Episodes\EpisodeDownloadController;
-use App\Http\Controllers\Episodes\EpisodeIndexController;
-use App\Http\Controllers\Episodes\EpisodeShowController;
+use App\Http\Controllers\Listen\ListenEpisodeAudioController;
+use App\Http\Controllers\Listen\ListenEpisodeDownloadController;
+use App\Http\Controllers\Listen\ListenEpisodeIndexController;
+use App\Http\Controllers\Listen\ListenEpisodeShowController;
+use App\Http\Controllers\Listen\ListenHomeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -24,9 +25,17 @@ Route::get('/login', static fn () => redirect()->route('auth.google.redirect'))
 Route::get('/_local/admin/login', LocalAdminLoginController::class)
     ->name('local.admin.login');
 
-Route::middleware(['auth'])->group(function (): void {
-    Route::get('/episodes', EpisodeIndexController::class)->name('episodes.index');
-    Route::get('/episodes/{episode:episode_key}', EpisodeShowController::class)->name('episodes.show');
-    Route::get('/episodes/{episode:episode_key}/audio', EpisodeAudioController::class)->name('episodes.audio');
-    Route::get('/episodes/{episode:episode_key}/download', EpisodeDownloadController::class)->name('episodes.download');
+Route::middleware(['auth', 'viewer.allowed'])->prefix('listen')->name('listen.')->group(function (): void {
+    Route::get('/', ListenHomeController::class)->name('home');
+    Route::get('/episodes', ListenEpisodeIndexController::class)->name('episodes.index');
+    Route::get('/episodes/{episode:episode_key}', ListenEpisodeShowController::class)->name('episodes.show');
+    Route::get('/episodes/{episode:episode_key}/audio', ListenEpisodeAudioController::class)->name('episodes.audio');
+    Route::get('/episodes/{episode:episode_key}/download', ListenEpisodeDownloadController::class)->name('episodes.download');
+});
+
+Route::middleware(['auth', 'viewer.allowed'])->group(function (): void {
+    Route::get('/episodes', static fn () => redirect()->route('listen.episodes.index'))->name('episodes.index');
+    Route::get('/episodes/{episode:episode_key}', static fn (string $episode) => redirect()->route('listen.episodes.show', ['episode' => $episode]))->name('episodes.show');
+    Route::get('/episodes/{episode:episode_key}/audio', static fn (string $episode) => redirect()->route('listen.episodes.audio', ['episode' => $episode]))->name('episodes.audio');
+    Route::get('/episodes/{episode:episode_key}/download', static fn (string $episode) => redirect()->route('listen.episodes.download', ['episode' => $episode]))->name('episodes.download');
 });
