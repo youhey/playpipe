@@ -3,25 +3,41 @@
 @section('title', 'Episodes')
 
 @section('content')
-    <div class="page-header">
-        <div>
-            <h1>Episodes</h1>
-            <div class="meta-row">
-                <span>{{ $episodes->total() }} available</span>
-            </div>
+    @php
+        $featuredEpisode = $episodes->getCollection()->first();
+    @endphp
+
+    <header class="transmission-header">
+        <h1 class="transmission-title">Transmission_Log</h1>
+        <div class="transmission-meta">
+            <span>Encrypted Feed</span>
+            <span>Latency: 12ms</span>
+            <span>{{ $episodes->total() }} Available</span>
+        </div>
+    </header>
+
+    <div class="signal-strip">
+        <span>Frequency: 99.7 MHz [Live]</span>
+        <div class="signal-bars" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
         </div>
     </div>
 
-    <form class="filters" method="GET" action="{{ route('episodes.index') }}">
+    <form class="filter-row" method="GET" action="{{ route('episodes.index') }}">
+        <label class="sr-only" for="episode-search">Search title or episode key</label>
         <input
+            id="episode-search"
             class="input"
             type="search"
             name="q"
             value="{{ $filters['q'] ?? '' }}"
             placeholder="Search title or episode key"
-            aria-label="Search title or episode key"
         >
-        <select class="select" name="character" aria-label="Character">
+        <label class="sr-only" for="episode-character">Character</label>
+        <select id="episode-character" class="select" name="character">
             <option value="">All characters</option>
             @foreach ($characters as $character)
                 <option
@@ -32,33 +48,45 @@
                 </option>
             @endforeach
         </select>
-        <button class="button" type="submit">Search</button>
+        <button class="filter-button" type="submit">Scan</button>
     </form>
 
     <div class="episode-list">
         @forelse ($episodes as $episode)
-            <article class="episode-card">
-                <div>
-                    <a class="episode-card-title" href="{{ route('episodes.show', $episode) }}">
-                        {{ $episode->title }}
-                    </a>
-                    <div class="meta-row">
-                        <span>{{ $episode->published_at?->format('Y-m-d H:i') ?? $episode->recorded_at?->format('Y-m-d H:i') ?? $episode->created_at?->format('Y-m-d H:i') }}</span>
-                        <span>{{ $episode->character_name ?: $episode->character_key ?: 'No character' }}</span>
-                        <span>{{ $episode->audio_duration_seconds === null ? 'Duration unknown' : gmdate('i:s', $episode->audio_duration_seconds) }}</span>
-                        <span>{{ $episode->topics_count }} topics</span>
+            <article class="broadcast-panel">
+                <div class="panel-header">
+                    <span>EP_{{ str_pad((string) ($loop->iteration + (($episodes->currentPage() - 1) * $episodes->perPage())), 3, '0', STR_PAD_LEFT) }} // {{ $featuredEpisode && $featuredEpisode->is($episode) ? 'Current' : 'Archived' }}</span>
+                    <span>{{ $episode->published_at?->format('Y.m.d') ?? $episode->recorded_at?->format('Y.m.d') ?? $episode->created_at?->format('Y.m.d') }}</span>
+                </div>
+                <div class="panel-body">
+                    <h2 class="episode-title">
+                        <a href="{{ route('episodes.show', $episode) }}">{{ $episode->title }}</a>
+                    </h2>
+
+                    <div class="player-frame" aria-hidden="true">
+                        <span class="play-square">▷</span>
+                        <div class="waveform">
+                            @for ($i = 0; $i < 28; $i++)
+                                <span></span>
+                            @endfor
+                        </div>
+                        <span class="duration">{{ $episode->audio_duration_seconds === null ? '--:--' : gmdate('i:s', $episode->audio_duration_seconds) }}</span>
                     </div>
-                </div>
-                <div class="meta-row">
-                    <span>{{ $episode->episode_key }}</span>
-                </div>
-                <div class="actions">
-                    <a class="button secondary" href="{{ route('episodes.show', $episode) }}">Open</a>
+
+                    <div class="meta-row">
+                        <span>{{ $episode->character_name ?: $episode->character_key ?: 'No character' }}</span>
+                        <span>{{ $episode->topics_count }} Topics</span>
+                        <span>{{ $episode->language }}</span>
+                    </div>
+                    <div class="episode-key">{{ $episode->episode_key }}</div>
+                    <div class="actions" style="margin-top: 14px;">
+                        <a class="button secondary" href="{{ route('episodes.show', $episode) }}">Open Protocol</a>
+                    </div>
                 </div>
             </article>
         @empty
-            <div class="panel">
-                <p class="muted">No episodes found.</p>
+            <div class="empty-panel">
+                No episodes found.
             </div>
         @endforelse
     </div>
