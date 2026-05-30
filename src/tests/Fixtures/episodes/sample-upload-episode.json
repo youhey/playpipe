@@ -1,0 +1,48 @@
+{
+  "episode": {
+    "episode_key": "sample-upload-episode",
+    "title": "サンプルアップロードエピソード",
+    "language": "ja",
+    "published_at": "2026-05-29T07:00:00+09:00",
+    "processed_at": "2026-05-29T06:55:12+09:00",
+    "character": {
+      "key": "neko_nyan_balanced_radio",
+      "name": "ねこにゃん"
+    },
+    "scenario_json": {
+      "sections": [
+        {
+          "type": "opening",
+          "title": "オープニング",
+          "text": "こんにちは。",
+          "estimated_duration_seconds": 5,
+          "metadata": {
+            "voice": "neutral"
+          }
+        },
+        {
+          "type": "topic",
+          "title": "GitHub セキュリティ",
+          "text": "GitHub の設定を点検する CLI ツールの話題です。",
+          "estimated_duration_seconds": 60,
+          "topic_ids": [
+            "upstream:236"
+          ]
+        }
+      ]
+    },
+    "topics": [
+      {
+        "topic_id": "upstream:236",
+        "status": "used_in_scenario",
+        "title": "GitHubアカウントのセキュリティ設定を点検するCLI「Moat」",
+        "summary": "GitHubの設定を読み取り専用で点検するCLIツールです。",
+        "why_it_matters": "リポジトリ運用やサプライチェーン安全性に関わります。",
+        "source_name": "Laravel News",
+        "url": "https://laravel-news.com/example",
+        "discussion_url": null,
+        "sort_order": 1
+      }
+    ]
+  }
+}

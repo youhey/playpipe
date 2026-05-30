@@ -184,6 +184,16 @@ Automated tests must not call real external APIs. Google OAuth、Laravel Cloud A
 - Episode JSON は original uploaded payload を保存します。
 - DB では Episode、scenario section、topic snapshot に展開します。
 
+## Episode Upload API Contract
+
+The playpipe Episode Upload API contract is defined in `docs/openapi.yaml`.
+
+Do not change Episode Upload API request or response schema definitions unless explicitly requested.
+
+When Episode Upload API behavior, request fields, response shape, or accepted `episode_json` shape is intentionally changed, update `docs/openapi.yaml`, `docs/api.md` if applicable, and schema validation tests in the same task.
+
+This rule is important because `voicepipe` and other downstream Rust applications may rely on the OpenAPI schema.
+
 ## Playback Constraints
 
 - uploaded MP3 files を public storage から公開しません。

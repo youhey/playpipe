@@ -126,6 +126,8 @@ Content-Type: multipart/form-data
 
 The endpoint requires a Sanctum token with the `episodes:write` ability. It stores MP3 and uploaded Episode JSON on the configured object storage disk, then persists Episode, section, and topic rows in MySQL.
 
+The machine-readable contract is [docs/openapi.yaml](docs/openapi.yaml). Keep it as the source of truth for Rust and PHP integration.
+
 See [docs/api.md](docs/api.md).
 
 ## Playback UI

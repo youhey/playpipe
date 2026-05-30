@@ -4,6 +4,8 @@
 
 Phase 2 では `voicepipe` などの renderer から、MP3 file と `radiopipe` Episode JSON を受け取る write-only API を提供します。Phase 3 の playback UI は browser login session で保護された Web route として提供し、API token では保護しません。
 
+Machine-readable contract は [`docs/openapi.yaml`](openapi.yaml) です。`voicepipe` などの Rust application はこの OpenAPI document を integration contract として参照します。
+
 ## API Token
 
 API token は Filament admin の `/admin` から管理できます。
@@ -20,6 +22,13 @@ php artisan playpipe:users:rotate-api-token user@example.test --ability=episodes
 plain text token は発行直後だけ表示され、DB には保存されません。token hash、OAuth token、API secret は管理画面に表示しません。
 
 ## POST /api/episodes
+
+OpenAPI operation:
+
+```txt
+POST /api/episodes
+docs/openapi.yaml#/paths/~1api~1episodes/post
+```
 
 ```http
 POST /api/episodes
@@ -38,7 +47,7 @@ Request fields:
 | field | required | type | note |
 |---|---:|---|---|
 | `audio` | yes | file | MP3 file |
-| `episode_json` | yes | JSON string or file | `radiopipe` Episode JSON |
+| `episode_json` | yes | JSON part, JSON string, or file | `radiopipe` Episode JSON. Preferred contract is an `application/json` multipart part |
 | `audio_duration_seconds` | no | integer | renderer 側で分かる場合だけ送る |
 | `recorded_at` | no | datetime | renderer 側の生成日時 |
 | `voicepipe_version` | no | string | 任意 |
@@ -79,6 +88,8 @@ Response:
 ```
 
 ## Episode JSON
+
+`episode_json` の documented schema は `docs/openapi.yaml#/components/schemas/RadiopipeEpisodePayload` です。安定した必須 field だけを要求し、`radiopipe` / `voicepipe` 側の追加 field は forward compatibility のため許可します。
 
 最低限、以下を要求します。
 
@@ -121,6 +132,8 @@ Validation error は Laravel 標準の `422 Unprocessable Entity` です。
   }
 }
 ```
+
+OpenAPI schema validation tests verify success, duplicate, validation, authentication, and authorization response shapes against `docs/openapi.yaml`.
 
 ## Storage
 

@@ -1,0 +1,500 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "playpipe API",
+    "version": "1.0.0",
+    "description": "Private API for uploading rendered radio episodes from voicepipe."
+  },
+  "servers": [
+    {
+      "url": "https://example.test",
+      "description": "Deployment-specific base URL"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/api/episodes": {
+      "post": {
+        "summary": "Upload rendered episode",
+        "description": "Private Episode Upload API intended for voicepipe. Requires a Laravel Sanctum bearer token with the episodes:write ability. Accepts multipart/form-data with an MP3 file and radiopipe Episode JSON, stores both on the configured object storage disk, persists the original Episode JSON in MySQL, expands scenario sections and topics into DB records, and returns lightweight created Episode metadata.",
+        "operationId": "uploadEpisode",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/EpisodeUploadRequest"
+              },
+              "encoding": {
+                "episode_json": {
+                  "contentType": "application/json"
+                },
+                "render_metadata_json": {
+                  "contentType": "application/json"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Episode was uploaded and persisted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EpisodeUploadResponse"
+                },
+                "examples": {
+                  "created": {
+                    "value": {
+                      "episode": {
+                        "episode_key": "episode_2026-05-29_0700_neko_nyan_001",
+                        "status": "available",
+                        "title": "今日のギークニュース",
+                        "language": "ja",
+                        "audio": {
+                          "disk": "s3",
+                          "path": "episodes/episode_2026-05-29_0700_neko_nyan_001/audio.mp3",
+                          "size_bytes": 12345678,
+                          "duration_seconds": 900
+                        },
+                        "sections_count": 5,
+                        "topics_count": 5,
+                        "created_at": "2026-05-30T03:00:00+00:00"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "description": "Episode key already exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DuplicateEpisodeResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "responses": {
+      "Unauthorized": {
+        "description": "Unauthenticated request.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Authenticated token is missing the required episodes:write ability.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "ValidationError": {
+        "description": "Request validation failed.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ValidationErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "EpisodeUploadRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "audio",
+          "episode_json"
+        ],
+        "properties": {
+          "audio": {
+            "type": "string",
+            "format": "binary",
+            "description": "Rendered MP3 file."
+          },
+          "episode_json": {
+            "$ref": "#/components/schemas/RadiopipeEpisodePayload"
+          },
+          "audio_duration_seconds": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "voicepipe_version": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "render_metadata_json": {
+            "$ref": "#/components/schemas/RenderMetadata"
+          }
+        }
+      },
+      "EpisodeUploadResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "episode"
+        ],
+        "properties": {
+          "episode": {
+            "$ref": "#/components/schemas/EpisodeUploadResponseEpisode"
+          }
+        }
+      },
+      "EpisodeUploadResponseEpisode": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "episode_key",
+          "status",
+          "title",
+          "language",
+          "audio",
+          "sections_count",
+          "topics_count",
+          "created_at"
+        ],
+        "properties": {
+          "episode_key": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "available"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          },
+          "audio": {
+            "$ref": "#/components/schemas/EpisodeUploadResponseAudio"
+          },
+          "sections_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "topics_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "EpisodeUploadResponseAudio": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "disk",
+          "path",
+          "size_bytes",
+          "duration_seconds"
+        ],
+        "properties": {
+          "disk": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "size_bytes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "duration_seconds": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          }
+        }
+      },
+      "RadiopipeEpisodePayload": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "episode"
+        ],
+        "properties": {
+          "episode": {
+            "$ref": "#/components/schemas/RadiopipeEpisode"
+          }
+        }
+      },
+      "RadiopipeEpisode": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "episode_key",
+          "title",
+          "language",
+          "scenario_json"
+        ],
+        "properties": {
+          "episode_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string"
+          },
+          "published_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "processed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "title": {
+            "type": "string"
+          },
+          "character": {
+            "$ref": "#/components/schemas/EpisodeCharacter"
+          },
+          "language": {
+            "type": "string"
+          },
+          "scenario_json": {
+            "$ref": "#/components/schemas/EpisodeScenarioJson"
+          },
+          "topics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EpisodeTopic"
+            }
+          }
+        }
+      },
+      "EpisodeCharacter": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "EpisodeScenarioJson": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "sections"
+        ],
+        "properties": {
+          "sections": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/EpisodeScenarioSection"
+            }
+          }
+        }
+      },
+      "EpisodeScenarioSection": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "type",
+          "title",
+          "text"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "estimated_duration_seconds": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "topic_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      },
+      "EpisodeTopic": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "topic_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "summary": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "why_it_matters": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uri"
+          },
+          "discussion_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uri"
+          },
+          "sort_order": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "RenderMetadata": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "DuplicateEpisodeResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "message",
+          "episode_key"
+        ],
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "episode_key": {
+            "type": "string"
+          }
+        }
+      },
+      "ValidationErrorResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "message",
+          "errors"
+        ],
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      }
+    }
+  },
+  "x-codeSamples": [
+    {
+      "lang": "bash",
+      "label": "curl",
+      "source": "curl -X POST \"https://example.test/api/episodes\" \\\n  -H \"Authorization: Bearer ${PLAYPIPE_API_TOKEN}\" \\\n  -F \"audio=@sample.mp3;type=audio/mpeg\" \\\n  -F \"episode_json=@sample-episode.json;type=application/json\" \\\n  -F \"audio_duration_seconds=900\" \\\n  -F \"voicepipe_version=0.1.0\""
+    }
+  ]
+}

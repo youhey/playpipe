@@ -1,0 +1,17 @@
+{
+  "episode": {
+    "episode_key": "minimal-voicepipe-episode",
+    "title": "最小サンプルエピソード",
+    "language": "ja",
+    "scenario_json": {
+      "sections": [
+        {
+          "type": "opening",
+          "title": "オープニング",
+          "text": "こんにちは。",
+          "estimated_duration_seconds": 5
+        }
+      ]
+    }
+  }
+}
