@@ -10,7 +10,7 @@ Phase 2 adds a private Episode Upload API for receiving rendered MP3 files and `
 
 Phase 3 adds a private browser playback UI for listening to uploaded episodes, downloading MP3 files, and reading scenario sections and topics.
 
-Good/Bad feedback, feedback sync, and public podcast feeds are planned for later phases.
+Broader feedback sync workflows and public podcast feeds are planned for later phases.
 
 ## Position
 
@@ -145,6 +145,8 @@ It is separate from the Filament admin panel and focuses on listening to uploade
 Playback and download routes require a browser login session. MP3 files remain private object storage objects and are not exposed through public storage.
 
 The `/listen` viewer tracks per-user playback status for each episode: `UNPLAYED`, `IN_PROGRESS`, and `COMPLETED`.
+
+The `/listen` viewer can send per-topic feedback through radiopipe's Topic Rating API.
 
 See [docs/playback.md](docs/playback.md).
 

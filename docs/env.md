@@ -52,6 +52,19 @@ PLAYPIPE_AUDIO_DISK=s3
 
 production upload を local filesystem に永続保存しないでください。
 
+## Radiopipe Topic Rating
+
+```env
+PLAYPIPE_RADIOPIPE_API_URL=
+PLAYPIPE_RADIOPIPE_API_TOKEN=
+PLAYPIPE_RADIOPIPE_REQUEST_TIMEOUT=10
+PLAYPIPE_RADIOPIPE_MAX_RETRIES=2
+```
+
+`PLAYPIPE_RADIOPIPE_API_URL` は radiopipe application の base URL です。末尾 slash の有無はどちらでも扱えます。
+
+`PLAYPIPE_RADIOPIPE_API_TOKEN` は radiopipe 側で `topics:rate` ability を持つ Sanctum token です。HTML、JavaScript、logs、exception message に出さないでください。
+
 ## Admin Auth
 
 ```env

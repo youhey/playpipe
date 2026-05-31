@@ -86,6 +86,7 @@
                                 @if ($topic->why_it_matters)
                                     <p class="topic-text">{{ $topic->why_it_matters }}</p>
                                 @endif
+                                <livewire:listen.topic-rating-controls :topic="$topic" :key="'topic-rating-'.$topic->id" />
                                 <div class="actions">
                                     @if ($topic->url)
                                         <a class="button secondary" href="{{ $topic->url }}" target="_blank" rel="noopener noreferrer">Source</a>

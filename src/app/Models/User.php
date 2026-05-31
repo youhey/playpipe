@@ -46,6 +46,14 @@ class User extends Authenticatable implements FilamentUser
     }
 
     /**
+     * @return HasMany<TopicRating, $this>
+     */
+    public function topicRatings(): HasMany
+    {
+        return $this->hasMany(TopicRating::class);
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>

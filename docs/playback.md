@@ -78,10 +78,23 @@ Progress sync runs through Livewire every 5 seconds while audio is playing and i
 
 When an episode is `IN_PROGRESS`, the detail page provides a resume position. Resume starts at `0` when the saved position is below 5 seconds, within the final 10 seconds, or already at the duration.
 
+## Topic Rating Feedback
+
+`/listen` episode detail topic cards include rating controls.
+
+- Star buttons send Good rating values `1` through `5`.
+- `BAD_SIGNAL` sends rating `-1`.
+- Clicking the selected rating again, or `CLEAR_SIGNAL`, calls radiopipe `DELETE /api/topics/{id}/rating`.
+- Rating UI uses Livewire and a server-side radiopipe API client.
+- Browser JavaScript does not call radiopipe directly.
+- Current user selections are cached in `topic_ratings` so the selected state survives page reloads.
+
+Topics without `topic_id` are shown with `NO_TOPIC_ID` and cannot be rated.
+
 ## Range Requests
 
 Phase 3 does not implement full Laravel-side Range request handling. Browser playback prefers temporary URL redirect when the disk supports it. The fallback stream response is sufficient for small files and test coverage, but advanced seek behavior may be revisited later.
 
 ## Not Implemented
 
-Phase 3.6 does not implement Good / Bad feedback UI, radiopipe feedback sync, public podcast feeds, playback analytics, PWA support, real waveform generation, or `ffmpeg` / `ffprobe` integration.
+Phase 3.6 does not implement public podcast feeds, playback analytics, PWA support, real waveform generation, or `ffmpeg` / `ffprobe` integration.

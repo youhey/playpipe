@@ -203,7 +203,7 @@ This rule is important because `voicepipe` and other downstream Rust application
 - playback UI のために `ffmpeg` / `ffprobe` dependency を追加しません。
 - raw Episode JSON を画面に不用意に dump しません。
 - external links は `noopener noreferrer` を付けます。
-- feedback UI / feedback sync は Phase 3 では実装しません。
+- bulk feedback sync は明示依頼があるまで実装しません。
 
 ## Listen Viewer UI
 
@@ -228,6 +228,18 @@ Livewire may be used for server-side state synchronization such as playback star
 Playback state transition rules must live in a PHP service so they can be reused by Livewire and any future lightweight endpoint.
 
 The current policy is to use Livewire for progress sync. Do not add pagehide/sendBeacon/lightweight playback sync endpoints unless explicitly requested.
+
+## Topic Rating Feedback
+
+The `/listen` topic rating UI sends feedback to radiopipe via playpipe server-side services.
+
+Do not call radiopipe directly from browser JavaScript.
+
+Do not expose `PLAYPIPE_RADIOPIPE_API_TOKEN` in HTML, JavaScript, logs, or error messages.
+
+Use Livewire for user interaction and PHP services for radiopipe API calls.
+
+The audio player JavaScript responsibilities must remain separate from topic rating interactions.
 
 ## Phase 1 Scope
 
@@ -277,8 +289,7 @@ Phase 3 で実装するもの:
 
 以下は明示依頼があるまで実装しません。
 
-- topic Good / Bad 評価 UI
-- radiopipe feedback sync
+- radiopipe feedback retry queue / bulk sync
 - playback analytics
 - public podcast feed
 - audio synthesis

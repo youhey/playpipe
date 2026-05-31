@@ -141,6 +141,9 @@ class ListenViewerTest extends TestCase
             ->assertSee('GitHub の設定を読み取り専用で点検する CLI ツールです。')
             ->assertSee('Laravel News')
             ->assertSee('rel="noopener noreferrer"', false)
+            ->assertSee('SIGNAL_RATING')
+            ->assertSee('Rate Good 1')
+            ->assertSee('Rate Bad')
             ->assertSee('data-listen-player', false)
             ->assertSee('waveform-visualizer', false)
             ->assertSee('data-duration-seconds="900"', false)
@@ -155,6 +158,23 @@ class ListenViewerTest extends TestCase
             ->assertSee('data-end-seconds="60"', false)
             ->assertSee('00:00 / 15:00')
             ->assertDontSee('episode_json');
+    }
+
+    public function testListenEpisodeDetailDoesNotBreakForTopicWithoutTopicId(): void
+    {
+        $episode = $this->episodeWithContent();
+        EpisodeTopic::factory()->create([
+            'episode_id' => $episode->id,
+            'topic_id' => null,
+            'title' => 'topic id なし',
+            'sort_order' => 2,
+        ]);
+
+        $this->actingAs($this->allowedUser())
+            ->get("/listen/episodes/{$episode->episode_key}")
+            ->assertOk()
+            ->assertSee('topic id なし')
+            ->assertSee('NO_TOPIC_ID');
     }
 
     public function testListenAudioRouteRequiresLogin(): void

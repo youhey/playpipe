@@ -32,6 +32,13 @@ return [
         'storage_disk' => env('PLAYPIPE_AUDIO_DISK', env('FILESYSTEM_DISK', 's3')),
     ],
 
+    'radiopipe' => [
+        'base_url' => env('PLAYPIPE_RADIOPIPE_API_URL'),
+        'token' => env('PLAYPIPE_RADIOPIPE_API_TOKEN'),
+        'request_timeout' => (int) env('PLAYPIPE_RADIOPIPE_REQUEST_TIMEOUT', 10),
+        'max_retries' => (int) env('PLAYPIPE_RADIOPIPE_MAX_RETRIES', 2),
+    ],
+
     'listen' => [
         'operator_portraits' => [
             'images/listen/operators/nyozomi/default/sumashi.png',
