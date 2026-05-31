@@ -217,6 +217,18 @@ Authentication and allowed-email access rules are shared with the admin foundati
 
 Do not use remote hotlinked portrait images in production code.
 
+## Listen Playback State
+
+The `/listen` audio element and low-level playback behavior are owned by browser JavaScript.
+
+Do not move HTMLAudioElement control, waveform animation, time display, or scenario section tracking into Livewire/PHP unless explicitly requested.
+
+Livewire may be used for server-side state synchronization such as playback start, progress, completion, status badge, and resume hint.
+
+Playback state transition rules must live in a PHP service so they can be reused by Livewire and any future lightweight endpoint.
+
+The current policy is to use Livewire for progress sync. Do not add pagehide/sendBeacon/lightweight playback sync endpoints unless explicitly requested.
+
 ## Phase 1 Scope
 
 Phase 1 で実装するもの:

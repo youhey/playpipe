@@ -144,6 +144,8 @@ It is separate from the Filament admin panel and focuses on listening to uploade
 
 Playback and download routes require a browser login session. MP3 files remain private object storage objects and are not exposed through public storage.
 
+The `/listen` viewer tracks per-user playback status for each episode: `UNPLAYED`, `IN_PROGRESS`, and `COMPLETED`.
+
 See [docs/playback.md](docs/playback.md).
 
 ## Laravel Cloud

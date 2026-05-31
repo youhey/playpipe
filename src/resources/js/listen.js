@@ -10,7 +10,6 @@ const formatTime = (seconds) => {
     return `${minutes}:${remainingSeconds}`;
 };
 
-const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '';
 const playbackLabels = {
     unplayed: 'UNPLAYED',
     in_progress: 'IN_PROGRESS',
@@ -18,14 +17,12 @@ const playbackLabels = {
 };
 
 document.querySelectorAll('[data-listen-player]').forEach((player) => {
-    const audio = player.parentElement?.querySelector('[data-listen-audio]');
+    const playerRoot = player.closest('[data-episode-player-root]') ?? player.parentElement;
+    const audio = playerRoot?.querySelector('[data-listen-audio]');
     const playButton = player.querySelector('[data-listen-play]');
     const timeDisplay = player.querySelector('[data-listen-duration]');
     const fallbackDurationSeconds = Number(player.dataset.durationSeconds);
     const resumeSeconds = Number(player.dataset.resumeSeconds);
-    const playbackStartUrl = player.dataset.playbackStartUrl;
-    const playbackProgressUrl = player.dataset.playbackProgressUrl;
-    const playbackCompleteUrl = player.dataset.playbackCompleteUrl;
     const sectionList = document.querySelector('[data-section-list]');
     const playbackBadges = Array.from(document.querySelectorAll('[data-playback-badge]'));
     const sections = Array.from(document.querySelectorAll('[data-section]')).map((section) => ({
@@ -50,6 +47,18 @@ document.querySelectorAll('[data-listen-player]').forEach((player) => {
     let hasSentComplete = playbackStatus === 'completed';
     let hasAppliedResume = false;
     let lastProgressSyncedAt = 0;
+    let lastSyncedPositionSeconds = null;
+
+    const livewireComponent = () => {
+        const componentRoot = player.closest('[wire\\:id]');
+        const componentId = componentRoot?.getAttribute('wire:id');
+
+        if (!componentId || !window.Livewire?.find) {
+            return null;
+        }
+
+        return window.Livewire.find(componentId);
+    };
 
     const getKnownDuration = () => {
         if (Number.isFinite(audio.duration) && audio.duration > 0) {
@@ -86,36 +95,22 @@ document.querySelectorAll('[data-listen-player]').forEach((player) => {
         });
     };
 
-    const sendPlaybackRequest = (url, method, payload = {}, keepalive = false) => {
-        if (!url || !csrfToken) {
+    const callPlaybackAction = (method, ...params) => {
+        const component = livewireComponent();
+
+        if (!component?.$call) {
             return Promise.resolve(null);
         }
 
-        return fetch(url, {
-            method,
-            keepalive,
-            credentials: 'same-origin',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken,
-            },
-            body: JSON.stringify(payload),
-        }).then((response) => {
-            if (!response.ok) {
-                return null;
-            }
+        return component.$call(method, ...params).then(() => {
+            const status = typeof component.playbackStatus === 'string' ? component.playbackStatus : null;
 
-            return response.json();
-        }).then((data) => {
-            const status = data?.playback?.status;
-
-            if (typeof status === 'string') {
+            if (status !== null) {
                 updatePlaybackBadges(status);
                 hasSentComplete = status === 'completed';
             }
 
-            return data;
+            return status;
         }).catch(() => null);
     };
 
@@ -125,10 +120,12 @@ document.querySelectorAll('[data-listen-player]').forEach((player) => {
         }
 
         hasSentStart = true;
-        void sendPlaybackRequest(playbackStartUrl, 'POST');
+        const payload = playbackPayload();
+
+        void callPlaybackAction('startPlayback', payload.position_seconds, payload.duration_seconds ?? null);
     };
 
-    const sendProgress = (force = false, keepalive = false) => {
+    const sendProgress = (force = false) => {
         if (hasSentComplete || playbackStatus === 'completed') {
             return;
         }
@@ -143,17 +140,26 @@ document.querySelectorAll('[data-listen-player]').forEach((player) => {
             return;
         }
 
+        const payload = playbackPayload();
+
+        if (!force && lastSyncedPositionSeconds !== null && Math.abs(payload.position_seconds - lastSyncedPositionSeconds) < 1) {
+            return;
+        }
+
         lastProgressSyncedAt = now;
-        void sendPlaybackRequest(playbackProgressUrl, 'PATCH', playbackPayload(), keepalive);
+        lastSyncedPositionSeconds = payload.position_seconds;
+        void callPlaybackAction('syncProgress', payload.position_seconds, payload.duration_seconds ?? null);
     };
 
-    const sendComplete = (keepalive = false) => {
+    const sendComplete = () => {
         if (hasSentComplete) {
             return;
         }
 
         hasSentComplete = true;
-        void sendPlaybackRequest(playbackCompleteUrl, 'POST', playbackPayload(), keepalive);
+        const payload = playbackPayload();
+
+        void callPlaybackAction('completePlayback', payload.position_seconds, payload.duration_seconds ?? null);
     };
 
     const applyResumePosition = () => {
@@ -299,9 +305,4 @@ document.querySelectorAll('[data-listen-player]').forEach((player) => {
         completeIfNearEnd();
     });
 
-    window.addEventListener('pagehide', () => {
-        if (!audio.paused && !audio.ended) {
-            sendProgress(true, true);
-        }
-    });
 });

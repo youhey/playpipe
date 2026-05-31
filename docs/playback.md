@@ -62,6 +62,22 @@ Filament remains the admin/inspection surface:
 - `/admin/episode-sections`: extracted scenario sections
 - `/admin/episode-topics`: extracted topic snapshots
 
+## Playback State
+
+The Listen viewer tracks playback state per user and per episode.
+
+- `UNPLAYED`: represented by no `episode_playbacks` record
+- `IN_PROGRESS`: persisted after the user starts playback
+- `COMPLETED`: persisted when playback reaches the end
+
+`COMPLETED` is terminal. Replaying an episode does not move it back to `IN_PROGRESS`.
+
+Server-side state synchronization is handled by the `EpisodePlayer` Livewire component and `EpisodePlaybackService`. The browser JavaScript remains responsible for low-level `HTMLAudioElement` control, time display, waveform visualizer state, and scenario section tracking.
+
+Progress sync runs through Livewire every 5 seconds while audio is playing and immediately on pause. `pagehide`, `beforeunload`, `sendBeacon`, and `fetch keepalive` sync are intentionally not implemented in this phase.
+
+When an episode is `IN_PROGRESS`, the detail page provides a resume position. Resume starts at `0` when the saved position is below 5 seconds, within the final 10 seconds, or already at the duration.
+
 ## Range Requests
 
 Phase 3 does not implement full Laravel-side Range request handling. Browser playback prefers temporary URL redirect when the disk supports it. The fallback stream response is sufficient for small files and test coverage, but advanced seek behavior may be revisited later.

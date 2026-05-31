@@ -8,6 +8,7 @@
     <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
     <link rel="icon" href="{{ asset('icon.svg') }}" type="image/svg+xml">
     <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
+    @livewireStyles
     @vite(['resources/css/listen.css', 'resources/js/listen.js'])
 </head>
 <body>
@@ -83,5 +84,6 @@
         <strong>Signal: Strong</strong>
         <span>104.9 MHz Broadcast</span>
     </aside>
+    @livewireScripts
 </body>
 </html>
