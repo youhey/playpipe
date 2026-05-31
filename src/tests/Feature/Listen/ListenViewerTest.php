@@ -97,6 +97,8 @@ class ListenViewerTest extends TestCase
             ->assertSee('rel="noopener noreferrer"', false)
             ->assertSee('data-listen-player', false)
             ->assertSee('waveform-visualizer', false)
+            ->assertSee('data-duration-seconds="900"', false)
+            ->assertSee('00:00 / 15:00')
             ->assertDontSee('episode_json');
     }
 

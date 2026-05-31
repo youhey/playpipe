@@ -13,11 +13,37 @@ const formatTime = (seconds) => {
 document.querySelectorAll('[data-listen-player]').forEach((player) => {
     const audio = player.parentElement?.querySelector('[data-listen-audio]');
     const playButton = player.querySelector('[data-listen-play]');
-    const duration = player.querySelector('[data-listen-duration]');
+    const timeDisplay = player.querySelector('[data-listen-duration]');
+    const fallbackDurationSeconds = Number(player.dataset.durationSeconds);
 
     if (!(audio instanceof HTMLAudioElement) || !(playButton instanceof HTMLButtonElement)) {
         return;
     }
+
+    const getKnownDuration = () => {
+        if (Number.isFinite(audio.duration) && audio.duration > 0) {
+            return audio.duration;
+        }
+
+        if (Number.isFinite(fallbackDurationSeconds) && fallbackDurationSeconds > 0) {
+            return fallbackDurationSeconds;
+        }
+
+        return null;
+    };
+
+    const updateTimeDisplay = (currentSeconds = audio.currentTime) => {
+        if (!(timeDisplay instanceof HTMLElement)) {
+            return;
+        }
+
+        const knownDuration = getKnownDuration();
+        const safeCurrent = Number.isFinite(currentSeconds) && currentSeconds > 0 ? currentSeconds : 0;
+        const cappedCurrent = knownDuration === null ? safeCurrent : Math.min(safeCurrent, knownDuration);
+        const total = knownDuration === null ? '--:--' : formatTime(knownDuration);
+
+        timeDisplay.textContent = `${formatTime(cappedCurrent)} / ${total}`;
+    };
 
     const setPlayerState = (state) => {
         player.classList.toggle('is-idle', state === 'idle');
@@ -30,9 +56,15 @@ document.querySelectorAll('[data-listen-player]').forEach((player) => {
     let hasStartedPlayback = false;
 
     setPlayerState('idle');
+    updateTimeDisplay(0);
 
     playButton.addEventListener('click', () => {
         if (audio.paused) {
+            if (audio.ended) {
+                audio.currentTime = 0;
+                updateTimeDisplay(0);
+            }
+
             void audio.play();
 
             return;
@@ -44,20 +76,25 @@ document.querySelectorAll('[data-listen-player]').forEach((player) => {
     audio.addEventListener('play', () => {
         hasStartedPlayback = true;
         setPlayerState('playing');
+        updateTimeDisplay();
     });
 
     audio.addEventListener('pause', () => {
         setPlayerState(hasStartedPlayback ? 'paused' : 'idle');
+        updateTimeDisplay();
     });
 
     audio.addEventListener('ended', () => {
         hasStartedPlayback = false;
         setPlayerState('idle');
+        updateTimeDisplay(getKnownDuration() ?? audio.currentTime);
     });
 
     audio.addEventListener('loadedmetadata', () => {
-        if (duration instanceof HTMLElement && audio.duration > 0) {
-            duration.textContent = formatTime(audio.duration);
-        }
+        updateTimeDisplay();
+    });
+
+    audio.addEventListener('timeupdate', () => {
+        updateTimeDisplay();
     });
 });

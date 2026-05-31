@@ -522,6 +522,8 @@
             color: var(--pink);
             font-family: var(--font-label);
             font-size: 17px;
+            min-width: 118px;
+            text-align: right;
             white-space: nowrap;
         }
 

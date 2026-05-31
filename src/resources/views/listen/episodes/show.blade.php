@@ -24,7 +24,7 @@
                 <div
                     class="player-frame listen-player"
                     data-listen-player
-                    data-duration="{{ $episode->audio_duration_seconds === null ? '' : gmdate('i:s', $episode->audio_duration_seconds) }}"
+                    data-duration-seconds="{{ $episode->audio_duration_seconds }}"
                 >
                     <button class="play-square" type="button" data-listen-play aria-label="Play episode">▷</button>
                     <div class="waveform waveform-visualizer" data-listen-waveform aria-hidden="true">
@@ -32,7 +32,7 @@
                             <span></span>
                         @endfor
                     </div>
-                    <span class="duration" data-listen-duration>{{ $episode->audio_duration_seconds === null ? '--:--' : gmdate('i:s', $episode->audio_duration_seconds) }}</span>
+                    <span class="duration" data-listen-duration>{{ $episode->audio_duration_seconds === null ? '00:00 / --:--' : '00:00 / ' . gmdate('i:s', $episode->audio_duration_seconds) }}</span>
                 </div>
 
                 <audio class="listen-audio" preload="metadata" data-listen-audio>
