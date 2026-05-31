@@ -471,6 +471,43 @@
             text-transform: uppercase;
         }
 
+        .playback-badge,
+        .resume-hint {
+            display: inline-flex;
+            align-items: center;
+            min-height: 22px;
+            padding: 3px 8px;
+            border: 1px solid rgba(174, 238, 238, 0.34);
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--mint);
+            font-family: var(--font-label);
+            font-size: 11px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .playback-badge.is-unplayed {
+            border-color: rgba(130, 130, 130, 0.34);
+            color: #9a9a9a;
+        }
+
+        .playback-badge.is-in-progress {
+            border-color: var(--pink);
+            color: var(--pink);
+            box-shadow: 0 0 10px rgba(230, 50, 95, 0.2);
+        }
+
+        .playback-badge.is-completed {
+            border-color: var(--mint);
+            background: rgba(174, 238, 238, 0.14);
+            color: var(--mint);
+        }
+
+        .resume-hint {
+            border-color: rgba(230, 50, 95, 0.5);
+            color: var(--paper);
+        }
+
         .actions {
             display: flex;
             flex-wrap: wrap;

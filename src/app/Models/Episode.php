@@ -66,6 +66,16 @@ class Episode extends Model
     }
 
     /**
+     * Episode に対する user playback state 一覧。
+     *
+     * @return HasMany<EpisodePlayback, $this>
+     */
+    public function playbacks(): HasMany
+    {
+        return $this->hasMany(EpisodePlayback::class);
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>

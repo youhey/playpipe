@@ -3,12 +3,32 @@
 @section('title', $episode->title)
 
 @section('content')
+    @php
+        $playback = $episode->playbacks->first();
+        $playbackStatus = $playback?->status ?? 'unplayed';
+        $playbackLabel = match ($playbackStatus) {
+            'completed' => 'COMPLETED',
+            'in_progress' => 'IN_PROGRESS',
+            default => 'UNPLAYED',
+        };
+        $knownDurationSeconds = $playback?->duration_seconds ?? $episode->audio_duration_seconds;
+        $lastPositionSeconds = max(0, (int) ($playback?->last_position_seconds ?? 0));
+        $resumeSeconds = 0;
+
+        if ($playbackStatus === 'in_progress' && $lastPositionSeconds >= 5) {
+            $resumeSeconds = $knownDurationSeconds !== null && $lastPositionSeconds >= max(0, $knownDurationSeconds - 10)
+                ? 0
+                : $lastPositionSeconds;
+        }
+    @endphp
+
     <header class="transmission-header">
         <h1 class="transmission-title">Episode_Detail</h1>
         <div class="transmission-meta">
             <span>{{ $episode->episode_key }}</span>
             <span>{{ $episode->language }}</span>
             <span>{{ $episode->character_name ?: $episode->character_key ?: 'No character' }}</span>
+            <span class="playback-badge is-{{ str_replace('_', '-', $playbackStatus) }}" data-playback-badge>{{ $playbackLabel }}</span>
         </div>
     </header>
 
@@ -25,6 +45,11 @@
                     class="player-frame listen-player"
                     data-listen-player
                     data-duration-seconds="{{ $episode->audio_duration_seconds }}"
+                    data-playback-status="{{ $playbackStatus }}"
+                    data-resume-seconds="{{ $resumeSeconds }}"
+                    data-playback-start-url="{{ route('listen.episodes.playback.start', $episode) }}"
+                    data-playback-progress-url="{{ route('listen.episodes.playback.progress', $episode) }}"
+                    data-playback-complete-url="{{ route('listen.episodes.playback.complete', $episode) }}"
                 >
                     <button class="play-square" type="button" data-listen-play aria-label="Play episode">▷</button>
                     <div class="waveform waveform-visualizer" data-listen-waveform aria-hidden="true">
@@ -48,6 +73,10 @@
                     <span>Published: {{ $episode->published_at?->format('Y-m-d H:i') ?? 'N/A' }}</span>
                     <span>Recorded: {{ $episode->recorded_at?->format('Y-m-d H:i') ?? 'N/A' }}</span>
                     <span>Size: {{ $episode->audio_size_bytes === null ? 'N/A' : number_format($episode->audio_size_bytes) . ' bytes' }}</span>
+                    <span class="playback-badge is-{{ str_replace('_', '-', $playbackStatus) }}" data-playback-badge>{{ $playbackLabel }}</span>
+                    @if ($resumeSeconds > 0)
+                        <span class="resume-hint">RESUME {{ gmdate('i:s', $resumeSeconds) }}</span>
+                    @endif
                 </div>
 
                 <div class="actions" style="margin-top: 14px;">

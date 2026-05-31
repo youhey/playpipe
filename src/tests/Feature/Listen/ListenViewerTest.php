@@ -90,7 +90,7 @@ class ListenViewerTest extends TestCase
 
     public function testListenEpisodesUsesProtocolPaginationLayout(): void
     {
-        for ($i = 1; $i <= 13; $i++) {
+        for ($i = 1; $i <= 13; ++$i) {
             $this->episodeWithContent([
                 'episode_key' => sprintf('episode-page-%02d', $i),
                 'title' => sprintf('ページング確認 %02d', $i),

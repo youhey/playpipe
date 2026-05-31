@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Listen;
 
 use App\Models\Episode;
+use App\Models\EpisodePlayback;
+use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -22,6 +24,8 @@ class ListenEpisodeIndexController extends Controller
 
         $search = $filters['q'] ?? null;
         $character = $filters['character'] ?? null;
+        /** @var User $user */
+        $user = $request->user();
 
         $query = Episode::query()
             ->withCount('topics')
@@ -47,6 +51,17 @@ class ListenEpisodeIndexController extends Controller
         $episodes = $query
             ->paginate(12)
             ->withQueryString();
+
+        $playbackQuery = EpisodePlayback::query();
+        $playbackQuery->getQuery()
+            ->where('user_id', $user->id)
+            ->whereIn('episode_id', $episodes->getCollection()->pluck('id')->all());
+        $playbacks = $playbackQuery->get()->keyBy('episode_id');
+
+        $episodes->getCollection()->each(static function (Episode $episode) use ($playbacks): void {
+            $playback = $playbacks->get($episode->id);
+            $episode->setRelation('playbacks', $playback instanceof EpisodePlayback ? collect([$playback]) : collect());
+        });
 
         $characters = DB::table('episodes')
             ->select(['character_key', 'character_name'])

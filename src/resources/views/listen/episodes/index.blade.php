@@ -53,6 +53,16 @@
 
     <div class="episode-list">
         @forelse ($episodes as $episode)
+            @php
+                $playback = $episode->playbacks->first();
+                $playbackStatus = $playback?->status ?? 'unplayed';
+                $playbackLabel = match ($playbackStatus) {
+                    'completed' => 'COMPLETED',
+                    'in_progress' => 'IN_PROGRESS',
+                    default => 'UNPLAYED',
+                };
+                $resumeSeconds = $playbackStatus === 'in_progress' ? max(0, (int) ($playback?->last_position_seconds ?? 0)) : 0;
+            @endphp
             <article class="broadcast-panel protocol-card">
                 <div class="panel-header">
                     <span>EP_{{ str_pad((string) ($loop->iteration + (($episodes->currentPage() - 1) * $episodes->perPage())), 3, '0', STR_PAD_LEFT) }} // {{ $featuredEpisode && $featuredEpisode->is($episode) ? 'Current' : 'Archived' }}</span>
@@ -88,11 +98,19 @@
                             <span>Status</span>
                             <strong>{{ $featuredEpisode && $featuredEpisode->is($episode) ? 'Current' : 'Archived' }}</strong>
                         </div>
+                        <div>
+                            <span>Playback</span>
+                            <strong>{{ $playbackLabel }}</strong>
+                        </div>
                     </div>
 
                     <div class="meta-row">
                         <span>{{ $episode->character_name ?: $episode->character_key ?: 'No character' }}</span>
                         <span>{{ $episode->language }}</span>
+                        <span class="playback-badge is-{{ str_replace('_', '-', $playbackStatus) }}" data-playback-badge>{{ $playbackLabel }}</span>
+                        @if ($resumeSeconds >= 5)
+                            <span class="resume-hint">RESUME {{ gmdate('i:s', $resumeSeconds) }}</span>
+                        @endif
                     </div>
                     <div class="episode-key">{{ $episode->episode_key }}</div>
                     <div class="actions" style="margin-top: 14px;">
