@@ -28,7 +28,8 @@ class ListenViewerTest extends TestCase
     public function testGuestCannotAccessListenHome(): void
     {
         $this->get('/listen')
-            ->assertRedirect('/login');
+            ->assertRedirect(route('auth.google.redirect'))
+            ->assertSessionHas('url.intended', url('/listen'));
     }
 
     public function testAuthenticatedAllowedUserCanAccessListenHome(): void
@@ -119,7 +120,7 @@ class ListenViewerTest extends TestCase
         $episode = $this->episodeWithContent();
 
         $this->get("/listen/episodes/{$episode->episode_key}/audio")
-            ->assertRedirect('/login');
+            ->assertRedirect(route('auth.google.redirect'));
     }
 
     public function testAuthenticatedAllowedUserCanReadListenAudioResponse(): void
@@ -147,7 +148,7 @@ class ListenViewerTest extends TestCase
         $episode = $this->episodeWithContent();
 
         $this->get("/listen/episodes/{$episode->episode_key}/download")
-            ->assertRedirect('/login');
+            ->assertRedirect(route('auth.google.redirect'));
     }
 
     public function testAuthenticatedAllowedUserCanDownloadListenAudio(): void

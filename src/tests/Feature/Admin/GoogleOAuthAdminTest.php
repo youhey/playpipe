@@ -2,12 +2,16 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Filament\Widgets\ListenAppWidget;
+use App\Models\Episode;
 use App\Models\User;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\User as SocialiteUser;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 /**
@@ -31,6 +35,52 @@ class GoogleOAuthAdminTest extends TestCase
             'google_id' => 'google-admin',
             'avatar_url' => 'https://example.test/avatar.png',
         ]);
+    }
+
+    public function testAllowedGoogleEmailReturnsToIntendedListenUrl(): void
+    {
+        config(['playpipe.admin.allowed_emails' => ['admin@example.test']]);
+        $this->fakeGoogleUser(email: 'admin@example.test');
+
+        $this
+            ->withSession(['url.intended' => url('/listen/episodes')])
+            ->get(route('auth.google.callback'))
+            ->assertRedirect(url('/listen/episodes'));
+
+        $this->assertAuthenticated();
+    }
+
+    public function testAllowedGoogleEmailReturnsToIntendedAdminUrl(): void
+    {
+        config(['playpipe.admin.allowed_emails' => ['admin@example.test']]);
+        $this->fakeGoogleUser(email: 'admin@example.test');
+
+        $this
+            ->withSession(['url.intended' => url('/admin')])
+            ->get(route('auth.google.callback'))
+            ->assertRedirect(url('/admin'));
+
+        $this->assertAuthenticated();
+    }
+
+    public function testUnsafeIntendedUrlFallsBackToAdminDashboard(): void
+    {
+        config(['playpipe.admin.allowed_emails' => ['admin@example.test']]);
+
+        foreach ([
+            'https://evil.example.test/listen',
+            url('/auth/google/callback'),
+            url('/logout'),
+            url('/api/episodes'),
+        ] as $intendedUrl) {
+            Auth::logout();
+            $this->fakeGoogleUser(email: 'admin@example.test');
+
+            $this
+                ->withSession(['url.intended' => $intendedUrl])
+                ->get(route('auth.google.callback'))
+                ->assertRedirect(url('/admin'));
+        }
     }
 
     public function testDisallowedGoogleEmailCannotLogIn(): void
@@ -74,6 +124,31 @@ class GoogleOAuthAdminTest extends TestCase
         $this->actingAs($user)
             ->get('/admin')
             ->assertOk();
+    }
+
+    public function testAdminDashboardShowsListenAppNavigationAndWidget(): void
+    {
+        config(['playpipe.admin.allowed_emails' => ['admin@example.test']]);
+        config(['playpipe.upload.storage_disk' => 's3']);
+        $episode = Episode::factory()->create([
+            'title' => '最新エピソード',
+            'published_at' => '2026-05-31 07:00:00',
+        ]);
+
+        $this
+            ->actingAs(User::factory()->create(['email' => 'admin@example.test']))
+            ->get('/admin')
+            ->assertOk()
+            ->assertSee('Listen App')
+            ->assertSee(route('listen.home'), false);
+
+        $component = Livewire::test(ListenAppWidget::class);
+        $component->assertSee('Listen App');
+        $component->assertSee($episode->title);
+        $component->assertSee('1');
+        $component->assertSee('s3');
+        $component->assertSee('OPEN LISTEN');
+        $component->assertSee(route('listen.home'));
     }
 
     public function testUserRemovedFromAllowListCannotAccessFilamentPanel(): void
