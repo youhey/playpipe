@@ -60,7 +60,15 @@ class ListenViewerTest extends TestCase
             ->assertOk()
             ->assertSee('Encrypted Feed')
             ->assertSee($episode->title)
-            ->assertSee('Protocol_Home');
+            ->assertSee('Protocol_Home')
+            ->assertSee('Open Protocol')
+            ->assertSee('Published')
+            ->assertSee('Recorded')
+            ->assertSee('Duration')
+            ->assertSee('15:00')
+            ->assertSee('128,000 bytes')
+            ->assertDontSee('player-frame', false)
+            ->assertDontSee('waveform', false);
     }
 
     public function testListenEpisodesSupportsSearchAndCharacterFilter(): void

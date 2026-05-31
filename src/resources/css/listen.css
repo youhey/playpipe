@@ -396,11 +396,21 @@
 
         .episode-list {
             display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
             gap: 18px;
         }
 
+        .protocol-card {
+            min-width: 0;
+        }
+
+        .protocol-card .panel-body {
+            display: grid;
+            gap: 14px;
+        }
+
         .episode-title {
-            margin: 0 0 12px;
+            margin: 0;
             color: var(--mint);
             font-size: clamp(19px, 2.3vw, 26px);
             line-height: 1.2;
@@ -414,6 +424,41 @@
             color: var(--muted);
             font-size: 12px;
             overflow-wrap: anywhere;
+        }
+
+        .protocol-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .protocol-grid div {
+            min-width: 0;
+            padding: 8px 10px;
+            border: 1px solid rgba(174, 238, 238, 0.18);
+            background: rgba(0, 0, 0, 0.42);
+        }
+
+        .protocol-grid span,
+        .protocol-grid strong {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .protocol-grid span {
+            color: var(--muted);
+            font-family: var(--font-label);
+            font-size: 10px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .protocol-grid strong {
+            color: var(--paper);
+            font-family: var(--font-label);
+            font-size: 12px;
         }
 
         .meta-row {
@@ -781,6 +826,14 @@
             .filter-button,
             .button {
                 width: 100%;
+            }
+
+            .episode-list {
+                grid-template-columns: 1fr;
+            }
+
+            .protocol-grid {
+                grid-template-columns: 1fr;
             }
 
             .panel-body {
