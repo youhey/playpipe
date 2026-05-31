@@ -72,6 +72,26 @@ class ListenViewerTest extends TestCase
             ->assertDontSee('waveform', false);
     }
 
+    public function testListenEpisodesUsesProtocolPaginationLayout(): void
+    {
+        for ($i = 1; $i <= 13; $i++) {
+            $this->episodeWithContent([
+                'episode_key' => sprintf('episode-page-%02d', $i),
+                'title' => sprintf('ページング確認 %02d', $i),
+            ]);
+        }
+
+        $this->actingAs($this->allowedUser())
+            ->get('/listen/episodes')
+            ->assertOk()
+            ->assertSee('protocol-pagination', false)
+            ->assertSee('protocol-pagination-controls', false)
+            ->assertSee('Next')
+            ->assertSee('1')
+            ->assertSee('2')
+            ->assertDontSee('sm:flex', false);
+    }
+
     public function testListenEpisodesSupportsSearchAndCharacterFilter(): void
     {
         $episode = $this->episodeWithContent(['episode_key' => 'episode-visible']);

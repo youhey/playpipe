@@ -726,6 +726,72 @@
             font-size: 13px;
         }
 
+        .protocol-pagination {
+            display: grid;
+            gap: 10px;
+            padding: 12px;
+            border: 2px solid rgba(174, 238, 238, 0.28);
+            background:
+                linear-gradient(90deg, rgba(0, 0, 0, 0.88), rgba(19, 19, 19, 0.72)),
+                repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 5px);
+            box-shadow: 5px 5px 0 rgba(174, 0, 54, 0.3);
+        }
+
+        .protocol-pagination-status {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            color: var(--mint);
+            font-family: var(--font-label);
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .protocol-pagination-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .protocol-pagination-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 38px;
+            min-height: 36px;
+            padding: 7px 10px;
+            border: 1px solid rgba(174, 238, 238, 0.38);
+            background: rgba(0, 0, 0, 0.62);
+            color: var(--mint);
+            font-family: var(--font-label);
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1;
+            text-transform: uppercase;
+        }
+
+        .protocol-pagination-link:hover {
+            border-color: var(--mint);
+            background: var(--mint);
+            color: var(--void);
+        }
+
+        .protocol-pagination-link.is-current {
+            border-color: var(--crimson);
+            background: var(--crimson);
+            color: var(--void);
+            box-shadow: 3px 3px 0 rgba(174, 238, 238, 0.28);
+        }
+
+        .protocol-pagination-link.is-disabled,
+        .protocol-pagination-link.is-ellipsis {
+            border-color: rgba(130, 130, 130, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            color: #6f6f6f;
+            pointer-events: none;
+        }
+
         .signal-widget {
             position: fixed;
             right: 24px;
@@ -752,15 +818,6 @@
             border-radius: 50%;
             content: "";
             box-shadow: 0 0 12px var(--mint);
-        }
-
-        .pagination nav > div:first-child {
-            display: none;
-        }
-
-        .pagination a,
-        .pagination span {
-            color: var(--mint);
         }
 
         @media (max-width: 860px) {
@@ -834,6 +891,22 @@
 
             .protocol-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .protocol-pagination {
+                gap: 12px;
+                margin-bottom: 4px;
+            }
+
+            .protocol-pagination-controls {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(42px, 1fr));
+                gap: 6px;
+            }
+
+            .protocol-pagination-link {
+                min-width: 0;
+                padding-inline: 6px;
             }
 
             .panel-body {

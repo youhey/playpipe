@@ -108,6 +108,6 @@
     </div>
 
     <div class="pagination">
-        {{ $episodes->links() }}
+        {{ $episodes->onEachSide(1)->links('listen.pagination') }}
     </div>
 @endsection
