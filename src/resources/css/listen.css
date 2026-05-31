@@ -557,6 +557,7 @@
 
         .section-card {
             padding: 14px;
+            transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
         }
 
         .section-card h3,
@@ -581,6 +582,36 @@
             color: #f0d8d4;
             white-space: pre-wrap;
             overflow-wrap: anywhere;
+        }
+
+        .section-list.is-tracking .section-card.is-dimmed {
+            border-color: rgba(130, 130, 130, 0.18);
+            background: rgba(10, 10, 10, 0.58);
+            opacity: 0.48;
+        }
+
+        .section-list.is-tracking .section-card.is-dimmed .section-kicker,
+        .section-list.is-tracking .section-card.is-dimmed h3,
+        .section-list.is-tracking .section-card.is-dimmed .section-text {
+            color: #8a8a8a;
+        }
+
+        .section-list.is-tracking .section-card.is-active {
+            border-color: var(--crimson);
+            background:
+                linear-gradient(90deg, rgba(244, 246, 249, 0.94), rgba(240, 216, 212, 0.88)),
+                var(--paper);
+            box-shadow: 8px 8px 0 rgba(174, 0, 54, 0.34), 0 0 22px rgba(230, 50, 95, 0.28);
+            opacity: 1;
+        }
+
+        .section-list.is-tracking .section-card.is-active .section-kicker,
+        .section-list.is-tracking .section-card.is-active h3 {
+            color: var(--crimson);
+        }
+
+        .section-list.is-tracking .section-card.is-active .section-text {
+            color: #111111;
         }
 
         details.topic-card {

@@ -63,9 +63,22 @@
                 <span>{{ $episode->sections->count() }} Blocks</span>
             </div>
             <div class="panel-body">
-                <div class="section-list">
+                <div class="section-list" data-section-list>
+                    @php
+                        $sectionStartSeconds = 0;
+                        $sectionFallbackSeconds = 30;
+                    @endphp
                     @forelse ($episode->sections as $section)
-                        <article class="section-card">
+                        @php
+                            $sectionDurationSeconds = max(1, (int) ($section->estimated_duration_seconds ?? $sectionFallbackSeconds));
+                            $sectionEndSeconds = $sectionStartSeconds + $sectionDurationSeconds;
+                        @endphp
+                        <article
+                            class="section-card"
+                            data-section
+                            data-start-seconds="{{ $sectionStartSeconds }}"
+                            data-end-seconds="{{ $sectionEndSeconds }}"
+                        >
                             <div class="section-kicker">
                                 <span>{{ str_pad((string) $section->sort_order, 3, '0', STR_PAD_LEFT) }}</span>
                                 <span>{{ $section->section_type }}</span>
@@ -76,6 +89,9 @@
                             <h3>{{ $section->title }}</h3>
                             <p class="section-text">{{ $section->text }}</p>
                         </article>
+                        @php
+                            $sectionStartSeconds = $sectionEndSeconds;
+                        @endphp
                     @empty
                         <p class="section-text">No sections found.</p>
                     @endforelse

@@ -15,6 +15,17 @@ document.querySelectorAll('[data-listen-player]').forEach((player) => {
     const playButton = player.querySelector('[data-listen-play]');
     const timeDisplay = player.querySelector('[data-listen-duration]');
     const fallbackDurationSeconds = Number(player.dataset.durationSeconds);
+    const sectionList = document.querySelector('[data-section-list]');
+    const sections = Array.from(document.querySelectorAll('[data-section]')).map((section) => ({
+        element: section,
+        startSeconds: Number(section.dataset.startSeconds),
+        endSeconds: Number(section.dataset.endSeconds),
+    })).filter((section) => (
+        section.element instanceof HTMLElement
+        && Number.isFinite(section.startSeconds)
+        && Number.isFinite(section.endSeconds)
+        && section.endSeconds > section.startSeconds
+    ));
 
     if (!(audio instanceof HTMLAudioElement) || !(playButton instanceof HTMLButtonElement)) {
         return;
@@ -45,6 +56,34 @@ document.querySelectorAll('[data-listen-player]').forEach((player) => {
         timeDisplay.textContent = `${formatTime(cappedCurrent)} / ${total}`;
     };
 
+    const updateActiveSection = (currentSeconds = audio.currentTime, isTracking = hasEnteredTracking) => {
+        if (!(sectionList instanceof HTMLElement) || sections.length === 0) {
+            return;
+        }
+
+        sectionList.classList.toggle('is-tracking', isTracking);
+
+        if (!isTracking) {
+            sections.forEach(({ element }) => {
+                element.classList.remove('is-active', 'is-dimmed');
+            });
+
+            return;
+        }
+
+        const safeCurrent = Number.isFinite(currentSeconds) && currentSeconds > 0 ? currentSeconds : 0;
+        const activeSection = sections.find((section) => (
+            safeCurrent >= section.startSeconds && safeCurrent < section.endSeconds
+        )) ?? sections.at(-1);
+
+        sections.forEach(({ element }) => {
+            const isActive = element === activeSection?.element;
+
+            element.classList.toggle('is-active', isActive);
+            element.classList.toggle('is-dimmed', !isActive);
+        });
+    };
+
     const setPlayerState = (state) => {
         player.classList.toggle('is-idle', state === 'idle');
         player.classList.toggle('is-playing', state === 'playing');
@@ -54,6 +93,7 @@ document.querySelectorAll('[data-listen-player]').forEach((player) => {
     };
 
     let hasStartedPlayback = false;
+    let hasEnteredTracking = false;
 
     setPlayerState('idle');
     updateTimeDisplay(0);
@@ -63,6 +103,7 @@ document.querySelectorAll('[data-listen-player]').forEach((player) => {
             if (audio.ended) {
                 audio.currentTime = 0;
                 updateTimeDisplay(0);
+                updateActiveSection(0, true);
             }
 
             void audio.play();
@@ -75,26 +116,32 @@ document.querySelectorAll('[data-listen-player]').forEach((player) => {
 
     audio.addEventListener('play', () => {
         hasStartedPlayback = true;
+        hasEnteredTracking = true;
         setPlayerState('playing');
         updateTimeDisplay();
+        updateActiveSection();
     });
 
     audio.addEventListener('pause', () => {
         setPlayerState(hasStartedPlayback ? 'paused' : 'idle');
         updateTimeDisplay();
+        updateActiveSection();
     });
 
     audio.addEventListener('ended', () => {
         hasStartedPlayback = false;
         setPlayerState('idle');
         updateTimeDisplay(getKnownDuration() ?? audio.currentTime);
+        updateActiveSection(getKnownDuration() ?? audio.currentTime, true);
     });
 
     audio.addEventListener('loadedmetadata', () => {
         updateTimeDisplay();
+        updateActiveSection();
     });
 
     audio.addEventListener('timeupdate', () => {
         updateTimeDisplay();
+        updateActiveSection();
     });
 });
