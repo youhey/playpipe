@@ -19,11 +19,17 @@ document.querySelectorAll('[data-listen-player]').forEach((player) => {
         return;
     }
 
-    const setPlaying = (isPlaying) => {
-        player.classList.toggle('is-playing', isPlaying);
-        playButton.textContent = isPlaying ? 'Ⅱ' : '▷';
-        playButton.setAttribute('aria-label', isPlaying ? 'Pause episode' : 'Play episode');
+    const setPlayerState = (state) => {
+        player.classList.toggle('is-idle', state === 'idle');
+        player.classList.toggle('is-playing', state === 'playing');
+        player.classList.toggle('is-paused', state === 'paused');
+        playButton.textContent = state === 'playing' ? 'Ⅱ' : '▷';
+        playButton.setAttribute('aria-label', state === 'playing' ? 'Pause episode' : 'Play episode');
     };
+
+    let hasStartedPlayback = false;
+
+    setPlayerState('idle');
 
     playButton.addEventListener('click', () => {
         if (audio.paused) {
@@ -35,9 +41,19 @@ document.querySelectorAll('[data-listen-player]').forEach((player) => {
         audio.pause();
     });
 
-    audio.addEventListener('play', () => setPlaying(true));
-    audio.addEventListener('pause', () => setPlaying(false));
-    audio.addEventListener('ended', () => setPlaying(false));
+    audio.addEventListener('play', () => {
+        hasStartedPlayback = true;
+        setPlayerState('playing');
+    });
+
+    audio.addEventListener('pause', () => {
+        setPlayerState(hasStartedPlayback ? 'paused' : 'idle');
+    });
+
+    audio.addEventListener('ended', () => {
+        hasStartedPlayback = false;
+        setPlayerState('idle');
+    });
 
     audio.addEventListener('loadedmetadata', () => {
         if (duration instanceof HTMLElement && audio.duration > 0) {

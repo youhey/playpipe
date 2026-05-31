@@ -27,7 +27,7 @@
                     data-duration="{{ $episode->audio_duration_seconds === null ? '' : gmdate('i:s', $episode->audio_duration_seconds) }}"
                 >
                     <button class="play-square" type="button" data-listen-play aria-label="Play episode">▷</button>
-                    <div class="waveform" data-listen-waveform aria-hidden="true">
+                    <div class="waveform waveform-visualizer" data-listen-waveform aria-hidden="true">
                         @for ($i = 0; $i < 32; $i++)
                             <span></span>
                         @endfor

@@ -480,11 +480,36 @@
         .waveform span:nth-child(3n+1) { height: 18px; }
         .waveform span:nth-child(3n+2) { height: 28px; }
 
-        .listen-player.is-playing .waveform span {
+        .listen-player .waveform-visualizer {
+            opacity: 0;
+            transform: scaleX(0.96);
+            visibility: hidden;
+            transition: opacity 140ms ease, transform 140ms ease, visibility 140ms ease;
+        }
+
+        .listen-player.is-playing .waveform-visualizer,
+        .listen-player.is-paused .waveform-visualizer {
+            transform: scaleX(1);
+            visibility: visible;
+        }
+
+        .listen-player.is-playing .waveform-visualizer {
+            opacity: 1;
+        }
+
+        .listen-player.is-paused .waveform-visualizer {
+            opacity: 0.28;
+        }
+
+        .listen-player.is-paused .waveform-visualizer span {
+            transform: scaleY(0.58);
+        }
+
+        .listen-player.is-playing .waveform-visualizer span {
             animation: listen-wave 760ms steps(2, jump-none) infinite;
         }
 
-        .listen-player.is-playing .waveform span:nth-child(2n) {
+        .listen-player.is-playing .waveform-visualizer span:nth-child(2n) {
             animation-duration: 520ms;
         }
 

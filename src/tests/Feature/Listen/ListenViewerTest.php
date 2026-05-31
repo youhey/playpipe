@@ -96,6 +96,7 @@ class ListenViewerTest extends TestCase
             ->assertSee('Laravel News')
             ->assertSee('rel="noopener noreferrer"', false)
             ->assertSee('data-listen-player', false)
+            ->assertSee('waveform-visualizer', false)
             ->assertDontSee('episode_json');
     }
 
