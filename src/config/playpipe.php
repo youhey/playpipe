@@ -31,4 +31,15 @@ return [
         'audio_max_kb' => (int) env('PLAYPIPE_UPLOAD_AUDIO_MAX_KB', 102400),
         'storage_disk' => env('PLAYPIPE_AUDIO_DISK', env('FILESYSTEM_DISK', 's3')),
     ],
+
+    'listen' => [
+        'operator_portraits' => [
+            'images/listen/operators/nyozomi/default/sumashi.png',
+            'images/listen/operators/nyozomi/default/smile_soft.png',
+            'images/listen/operators/nyozomi/default/angry_open_mouth.png',
+            'images/listen/operators/nyozomi/default/sad_sulking.png',
+            'images/listen/operators/nyozomi/default/big_brassy_laugh.png',
+            'images/listen/operators/nyozomi/default/surprised_arms_up.png',
+        ],
+    ],
 ];

@@ -43,6 +43,22 @@ class ListenViewerTest extends TestCase
             ->assertSee($episode->title);
     }
 
+    public function testListenLayoutUsesConfiguredOperatorPortrait(): void
+    {
+        $this->episodeWithContent();
+        config([
+            'playpipe.listen.operator_portraits' => [
+                'images/listen/operators/nyozomi/default/sumashi.png',
+            ],
+        ]);
+
+        $this->actingAs($this->allowedUser())
+            ->get('/listen')
+            ->assertOk()
+            ->assertSee('images/listen/operators/nyozomi/default/sumashi.png', false)
+            ->assertDontSee('images/listen/operator-portrait.png', false);
+    }
+
     public function testDisallowedAuthenticatedUserCannotAccessListenHome(): void
     {
         config(['playpipe.admin.allowed_emails' => ['listener@example.test']]);

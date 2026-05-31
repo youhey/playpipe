@@ -10,6 +10,13 @@
     @vite(['resources/css/listen.css', 'resources/js/listen.js'])
 </head>
 <body>
+    @php
+        $operatorPortraits = array_values(config('playpipe.listen.operator_portraits', []));
+        $operatorPortrait = $operatorPortraits === []
+            ? 'images/listen/operator-portrait.png'
+            : $operatorPortraits[array_rand($operatorPortraits)];
+    @endphp
+
     <header class="mobile-topbar">
         <a class="brand-wordmark" href="{{ route('listen.episodes.index') }}">NOZOMI_RADIO_01</a>
         <div class="mobile-actions" aria-hidden="true">
@@ -27,7 +34,7 @@
             </div>
 
             <section class="operator-card" aria-label="Operator profile">
-                <img src="{{ asset('images/listen/operator-portrait.png') }}" alt="playpipe operator portrait">
+                <img src="{{ asset($operatorPortrait) }}" alt="playpipe operator portrait">
                 <div class="operator-card-body">
                     <span class="operator-card-title">playpipe</span>
                     Private episode playback.<br>
