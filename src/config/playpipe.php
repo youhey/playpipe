@@ -40,6 +40,12 @@ return [
             'images/listen/operators/nyozomi/default/sad_sulking.png',
             'images/listen/operators/nyozomi/default/big_brassy_laugh.png',
             'images/listen/operators/nyozomi/default/surprised_arms_up.png',
+            'images/listen/operators/nyozomi/roomwear/sumashi.png',
+            'images/listen/operators/nyozomi/roomwear/smile_soft.png',
+            'images/listen/operators/nyozomi/roomwear/angry_open_mouth.png',
+            'images/listen/operators/nyozomi/roomwear/sad_sulking.png',
+            'images/listen/operators/nyozomi/roomwear/big_brassy_laugh.png',
+            'images/listen/operators/nyozomi/roomwear/surprised_arms_up.png',
         ],
     ],
 ];
